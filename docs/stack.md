@@ -106,7 +106,8 @@ Toda a aplicação roda em **servidor próprio (on-premise)** utilizando contêi
 
 | Tecnologia | Papel no Projeto | Por que escolhemos? |
 | :--- | :--- | :--- |
-| **Docker & Docker Compose** | Empacotamento e orquestração | Padroniza a execução local (`dev`) e no servidor (`staging` e `prod`), isolando redes e limites de CPU/memória de cada serviço. |
-| **Terraform + HCP Terraform** | Infraestrutura como Código (IaC) | Versiona a configuração de rede, containers, buckets do Silo (S3) e DNS, mantendo o estado (`.tfstate`) seguro na nuvem e aplicando mudanças no servidor local via **HCP Terraform Agent**. |
-| **Infisical** | Gestão centralizada de segredos | Injeta variáveis de ambiente e chaves de API em tempo de execução (`infisical run`). **Nenhum segredo ou `.env` real fica salvo no repositório Git.** |
+| **Docker Engine** | Execução de contêineres | Isola todos os serviços na rede interna `shared-network` com limites de CPU/memória e volumes persistentes. |
+| **Cloudflare Tunnel (`cloudflared`)** | Exposição externa, DNS e TLS | Conecta o servidor on-premise à borda da Cloudflare via túnel *outbound-only*, provendo DNS e HTTPS/TLS automáticos para `app.`, `api.` e `s3.` sem abrir portas no roteador local. |
+| **Terraform + HCP Terraform Cloud** | Infraestrutura como Código (IaC) | Controla contêineres, volumes e redes pelo provider `kreuzwerker/docker` direto no socket do Docker (`/var/run/docker.sock`) ou via SSH (`docker_ssh_host`), com estado remoto (`.tfstate`) no tier gratuito do **HCP Terraform Cloud**. |
+| **Infisical** | Gestão centralizada de segredos | Injeta variáveis e credenciais dinamicamente via provider `infisical/infisical` (Universal Auth), segregadas nas pastas `/databases`, `/apps`, `/tools` e `/observability`. **Nenhum segredo fica salvo no repositório Git.** |
 | **GitHub Actions** | Integração e Entrega Contínua (CI/CD) | Executa testes, linters, validação de contrato OpenAPI e `terraform plan` a cada Pull Request, além de publicar imagens e automatizar o deploy. |

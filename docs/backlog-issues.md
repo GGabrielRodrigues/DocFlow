@@ -47,11 +47,11 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 - [x] Comparativo de LLMs (custo, saída estruturada, retenção de dados)
 - [x] Decisão do provedor inicial (Deepgram Nova-3 + Gemini 2.5 Flash) e plano de troca documentados em `docs/provedores-ia.md`
 
-### DOC-07 · ADR-005: Infraestrutura (Terraform + HCP Terraform + Infisical + Docker Compose) `[M0][docs][S]`
-- [ ] Registrar que a hospedagem é **servidor próprio on-premise** (sem provedor de nuvem para compute/storage) e as consequências: disponibilidade, energia, rede, backup off-site
-- [ ] Explicar por que o HCP Terraform usará **agents** instalados no servidor (a execução remota padrão não alcança a rede local)
-- [ ] Descrever fluxo de estado remoto e de injeção de segredos
-- [ ] Listar providers Terraform usados: `hashicorp/tfe`, `infisical/infisical`, provider de Docker via SSH (`kreuzwerker/docker`), `aminueza/minio`, provider do DNS escolhido
+### DOC-07 · Documentação da Infraestrutura (`infra/`: Terraform + HCP Terraform Cloud + Infisical + Docker Socket + Cloudflare Tunnel) `[M0][docs][S]`
+- [x] Registrar que a hospedagem é **servidor próprio on-premise** e a exposição externa (DNS + TLS) é provida pelo **Cloudflare Tunnel (`cloudflared`)** (`infra/README.md` e `infra/catalogo-modulos.md`)
+- [x] Explicar a estrutura em 3 camadas nos 4 domínios (`databases`, `apps`, `tools`, `observability`), o mapeamento dos 2 `Dockerfile`s (`web` e `server`), o uso do **HCP Terraform Cloud (tier gratuito)** e a conexão híbrida via socket do Docker (`unix:///var/run/docker.sock`) ou SSH (`docker_ssh_host`)
+- [x] Descrever o fluxo de estado remoto e o inventário completo de variáveis/segredos no Infisical (`infra/variaveis-e-segredos.md` e `infra/AGENTS.md`)
+- [x] Listar providers Terraform usados: `kreuzwerker/docker` (`~> 3.0.1`) e `infisical/infisical` (`~> 0.16.0`)
 
 ### DOC-08 · ADR-006: Multi-tenancy (coluna `institution_id` + isolamento) `[M0][docs][S]`
 Decidir entre coluna discriminadora, RLS do Postgres ou schema por tenant. Recomendado: coluna + RLS como defesa em profundidade.
