@@ -51,3 +51,31 @@ flowchart TD
 
 - **A API HTTP continua sempre leve e rápida:** quando o usuário pede para comprimir um vídeo, transcrever uma reunião ou gerar uma ata, a API apenas registra o `Job` no PostgreSQL, publica a tarefa no Redis e devolve a resposta imediatamente.
 - **Os Workers fazem o trabalho pesado em segundo plano:** consomem as filas do Redis (`io`, `cpu`, `ai`), atualizam o progresso do `Job` no banco e salvam os resultados no Silo (S3) e no PostgreSQL, com limites de CPU/memória isolados no Docker Compose.
+
+## 3. Estrutura inicial da API
+
+```powershell
+poetry install
+poetry run docflow-api
+```
+
+Com `DOCFLOW_DEBUG=true`, a documentação interativa fica disponível em
+`http://127.0.0.1:8000/docs`.
+
+- `src/docflow/main.py`: criação da aplicação e entrypoint do Uvicorn.
+- `src/docflow/api/router.py`: composição dos routers HTTP da aplicação.
+- `src/docflow/api/dependencies.py`: composição das dependências e serviços usados pelos routers.
+- `src/docflow/api/routers/`: routers HTTP e seus schemas de entrada/saída.
+- `src/docflow/application/`: casos de uso e orquestração.
+- `src/docflow/domain/`: tipos e regras puras do domínio.
+- `src/docflow/infra/`: integrações e implementações técnicas.
+- `src/docflow/core/`: configuração e middleware compartilhados.
+
+Os endpoints `/health` e `/ready` já estão registrados. O endpoint de readiness
+retorna `503` até que PostgreSQL, Redis e Silo sejam integrados; isso evita
+reportar uma aplicação operacional quando suas dependências ainda não existem.
+Novos módulos de negócio devem seguir essas camadas somente quando houver
+comportamento implementado, evitando pastas vazias e camadas artificiais.
+
+Cada requisição HTTP também gera um log JSON com `request_id`, método, caminho,
+status e duração. O nível pode ser configurado com `DOCFLOW_LOG_LEVEL`.
