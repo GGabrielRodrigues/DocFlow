@@ -14,6 +14,7 @@ module "silo" {
   silo_root_password        = var.silo_root_password
   silo_docflow_app_user     = var.silo_docflow_app_user
   silo_docflow_app_password = var.silo_docflow_app_password
+  silo_console_public_url   = var.silo_console_public_url
 
   silo_network = docker_network.shared.name
 }

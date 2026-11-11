@@ -23,6 +23,12 @@ variable "silo_docflow_app_password" {
   sensitive   = true
 }
 
+variable "silo_console_public_url" {
+  type        = string
+  description = "URL pública HTTPS da Console Web do Silo"
+  default     = ""
+}
+
 # Postgres
 variable "postgres_user" {
   type        = string
