@@ -3,6 +3,7 @@
 Diretório de **Infraestrutura como Código (IaC)** do **DocFlow**. Gerencia de forma declarativa, modular e automatizada os bancos de dados, aplicações próprias, ferramentas operacionais e observabilidade no servidor **on-premise**, com exposição externa via **Cloudflare Tunnel**.
 
 > **Documentação Técnica do Módulo (`infra/docs/`):**
+> - [`docs/servidor.md`](./docs/servidor.md) — Especificações de hardware, SO, rede (Tailscale) e dimensionamento do servidor on-premise (`INF-05`).
 > - [`docs/catalogo-modulos.md`](./docs/catalogo-modulos.md) — Catálogo dos 4 domínios (`databases`, `apps`, `tools`, `observability`), mapeamento dos 2 `Dockerfile`s para os submódulos de `apps`, rede `shared-network` e **Cloudflare Tunnel** (DNS + TLS).
 > - [`docs/variaveis-e-segredos.md`](./docs/variaveis-e-segredos.md) — Estrutura de pastas no **Infisical** (`/databases`, `/apps`, `/tools`, `/observability`), inventário de variáveis e contratos de `variables.tf`.
 > - [`AGENTS.md`](./AGENTS.md) — Guia de regras estritas e passo a passo para criação/manutenção de módulos Terraform.

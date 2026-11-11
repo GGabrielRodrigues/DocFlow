@@ -23,6 +23,11 @@ terraform {
 
 provider "docker" {
   host = var.docker_host != "" ? var.docker_host : data.infisical_secrets.databases_secrets.secrets["docker_ssh_host"].value
+  ssh_opts = [
+    "-o", "ControlMaster=auto",
+    "-o", "ControlPath=/tmp/tf-ssh-%r@%h:%p",
+    "-o", "ControlPersist=60s"
+  ]
 }
 
 provider "infisical" {

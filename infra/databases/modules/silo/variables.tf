@@ -5,8 +5,8 @@ variable "silo_network" {
 
 variable "silo_image" {
   type        = string
-  description = "Imagem Docker do Silo (S3-compatível, fork do MinIO)"
-  default     = "quay.io/minio/minio:latest"
+  description = "Imagem Docker do Silo (S3-compatível, fork do MinIO mantido pela Pigsty)"
+  default     = "pgsty/silo:latest"
 }
 
 variable "external_api_s3_port" {

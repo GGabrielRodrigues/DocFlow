@@ -131,9 +131,10 @@ Credenciais administrativas para pgAdmin e Portainer.
 | `pgadmin_default_password` | Senha de login inicial do pgAdmin 4 | `tools/modules/pgadmin` |
 | `pgadmin_port` | Porta de acesso ao pgAdmin | `tools/modules/pgadmin` |
 | `pgadmin_image_tag` | Tag da imagem do pgAdmin (`dpage/pgadmin4`) | `tools/modules/pgadmin` |
-| `portainer_port` | Porta HTTPS do Portainer | `tools/modules/portainer` |
-| `portainer_tunnel_port` | Porta do Edge Agent do Portainer | `tools/modules/portainer` |
-| `portainer_license_key` | Chave de licença do Portainer (se Business/EE) | `tools/modules/portainer` |
+| `portainer_port` | Porta HTTP/UI do Portainer (ex.: `9000`) | `tools/modules/portainer` |
+| `portainer_tunnel_port` | Porta do Edge Agent do Portainer (ex.: `8000`) | `tools/modules/portainer` |
+| `portainer_db_connection_url` | String de conexão opcional de banco para o Portainer (pode ser `""`) | `tools/modules/portainer` |
+| `portainer_license_key` | Chave de licença do Portainer EE (ou `""`) | `tools/modules/portainer` |
 
 ### 3.4. Pasta `/observability`
 Credenciais e parâmetros para Grafana, Grafana Loki e Grafana Alloy.

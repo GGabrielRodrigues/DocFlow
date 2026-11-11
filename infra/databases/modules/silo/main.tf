@@ -33,7 +33,8 @@ resource "docker_container" "silo" {
 
   env = [
     "MINIO_ROOT_USER=${var.silo_root_user}",
-    "MINIO_ROOT_PASSWORD=${var.silo_root_password}"
+    "MINIO_ROOT_PASSWORD=${var.silo_root_password}",
+    "MINIO_API_CORS_ALLOW_ORIGIN=*"
   ]
 
   command = ["server", "/data", "--console-address", ":9001"]
@@ -53,10 +54,15 @@ resource "docker_container" "silo" {
   }
 }
 
+resource "docker_image" "mc_img" {
+  name         = "pgsty/mc:latest"
+  keep_locally = true
+}
+
 resource "docker_container" "silo_setup" {
-  image = "minio/mc"
-  name  = "silo_setup"
-  count = 0 # Habilite (count = 1) ao provisionar pela primeira vez para criar buckets e usuário da aplicação
+  image    = docker_image.mc_img.image_id
+  name     = "silo_setup"
+  must_run = false
 
   depends_on = [docker_container.silo]
 
@@ -64,16 +70,29 @@ resource "docker_container" "silo_setup" {
 
   command = [
     <<-EOT
-      sleep 10;
-      mc alias set target http://${docker_container.silo.name}:9000 ${var.silo_root_user} ${var.silo_root_password};
-      mc mb --ignore-existing target/media-raw;
-      mc mb --ignore-existing target/media-processed;
-      mc mb --ignore-existing target/documents;
-      mc mb --ignore-existing target/loki-data;
-      mc admin user add target ${var.silo_docflow_app_user} ${var.silo_docflow_app_password};
-      mc admin policy attach target readwrite --user ${var.silo_docflow_app_user};
+      until mcli alias set target http://${docker_container.silo.name}:9000 ${var.silo_root_user} ${var.silo_root_password}; do
+        echo "Aguardando Silo iniciar..."
+        sleep 2
+      done
+      mcli mb --ignore-existing target/media-raw
+      mcli mb --ignore-existing target/media-processed
+      mcli mb --ignore-existing target/documents
+      mcli version enable target/documents
+      mcli mb --ignore-existing target/loki-data
+      mcli admin user add target ${var.silo_docflow_app_user} ${var.silo_docflow_app_password}
+      mcli admin policy attach target readwrite --user ${var.silo_docflow_app_user} || true
     EOT
   ]
+
+  lifecycle {
+    ignore_changes = [
+      network_mode,
+      entrypoint,
+      volumes,
+      env,
+      command
+    ]
+  }
 
   networks_advanced {
     name = var.silo_network

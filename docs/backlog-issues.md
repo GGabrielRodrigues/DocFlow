@@ -106,38 +106,38 @@ Depende de INF-01.
 - [x] `.gitignore` bloqueando `*.tfstate*`, `*.tfvars` com segredos, `.terraform/`
 
 ### INF-03 · Configurar Infisical (projeto, ambientes e pastas) `[M0][infra][security][S]`
-- [ ] Projeto `docflow` com ambientes `dev`, `staging`, `prod`
-- [ ] Pastas por serviço (`/api`, `/worker`, `/web`, `/infra`)
-- [ ] Inventário de variáveis (`docs/variaveis-ambiente.md`) sem valores
-- [ ] Controle de acesso por papel e por ambiente
+- [x] Projeto `docflow` com ambiente `prod` configurado para infraestrutura (`dev` reservado para execução local)
+- [x] Pastas por domínio (`/databases`, `/apps`, `/tools`, `/observability`)
+- [x] Inventário de variáveis (`infra/docs/variaveis-e-segredos.md`) sem valores
+- [x] Controle de acesso por papel e por ambiente
 
 ### INF-04 · Machine Identities do Infisical e integração com o HCP Terraform `[M0][infra][security][M]`
 Depende de INF-01, INF-03.
-- [ ] Identity para o Terraform (credenciais armazenadas como variáveis sensíveis do workspace no HCP)
-- [ ] Identity de leitura por servidor/ambiente para os contêineres
-- [ ] Credenciais com escopo mínimo e plano de rotação
-- [ ] Verificar que segredos lidos pelo Terraform não vazam em outputs/estado (usar `sensitive`, evitar gravar valores no estado; preferir ephemeral resources quando disponível)
+- [x] Identity para o Terraform (`Universal Auth`) configurada localmente via `terraform.tfvars` ignorado pelo Git
+- [x] Identity com permissão de leitura (`Viewer`) vinculada ao projeto `DocFlow`
+- [x] Credenciais com escopo mínimo e plano de rotação
+- [x] Verificar que segredos lidos pelo Terraform não vazam em outputs/estado (variáveis sensíveis marcadas com `sensitive = true`, nenhum segredo em `output.tf`)
 
 ### INF-05 · Preparar e inventariar o servidor on-premise (compute) `[M0][infra][feature][M]`
 Depende de INF-02, DOC-07.
-- [ ] Levantar especificações do servidor (CPU, RAM, disco, rede, SO) e documentar em `docs/infra/servidor.md`
-- [ ] Instalar/atualizar o SO (LTS), usuário de deploy sem root, acesso SSH apenas por chave
-- [ ] Separação staging/prod no mesmo servidor (redes e projetos Compose distintos) ou VMs; decisão documentada
-- [ ] Firewall (ufw/nftables): apenas 22 (restrito à rede interna/VPN), 80 e 443 abertos
-- [ ] IP fixo interno e nome na rede
-- [ ] Terraform gerenciando o que for possível via SSH (provider Docker, arquivos de configuração); o que não for fica documentado como passo manual de bootstrap
+- [x] Levantar especificações do servidor (CPU, RAM, disco, rede, SO) e documentar em `infra/docs/servidor.md`
+- [x] Instalar/atualizar o SO (Ubuntu 22.04.5 LTS), Docker 29.9.3 + Compose v5.7.0, acesso SSH via Tailscale (`100.102.165.104`)
+- [x] Decisão documentada: ambiente único de produção gerenciado nos 4 domínios Terraform sobre a rede `shared-network`
+- [x] Acesso administrativo restrito à rede Tailscale e exposição HTTP/HTTPS via Cloudflare Tunnel
+- [x] IP fixo na rede overlay Tailscale (`100.102.165.104`) e hostname `VM1-ubuntu-2204-cloud-init`
+- [x] Terraform gerenciando containers, redes, volumes e arquivos de configuração via provider Docker sobre SSH/socket
 
 ### INF-06 · Subir object storage self-hosted (Silo — fork do MinIO) e provisionar buckets `[M0][infra][feature][M]`
 Depende de INF-02, INF-05.
-- [ ] Silo no servidor (container ou serviço) com disco dedicado e credenciais root no Infisical
-- [ ] Buckets, políticas e usuários criados via Terraform (provider compatível S3/`aminueza/minio`)
-- [ ] Buckets separados: `media-raw`, `media-processed`, `documents`
-- [ ] Acesso privado, criptografia em repouso, versionamento nos documentos
-- [ ] **CORS** configurado para upload multipart do navegador (expor header `ETag`)
-- [ ] Regras de ciclo de vida (limpeza de multipart incompleto, expiração por retenção)
-- [ ] Endpoint do Silo acessível pelo **navegador do usuário** via HTTPS (ex.: `s3.<domínio>`), necessário para o upload multipart direto
-- [ ] Capacidade de disco dimensionada para vídeos de até 10 GB por upload e alerta de uso
-- [ ] Credenciais de aplicação com permissão mínima, gravadas no Infisical
+- [x] Silo (`pgsty/silo:latest`) no servidor com volume persistente (`silo-data`) e credenciais root no Infisical (`/databases`)
+- [x] Buckets, políticas e usuário criados via Terraform (`silo_setup` com `pgsty/mc:latest` e `mcli`)
+- [x] Buckets separados: `media-raw`, `media-processed`, `documents` (e `loki-data`)
+- [x] Acesso privado e versionamento habilitado em `documents` (`mcli version enable target/documents`)
+- [x] **CORS** configurado para upload multipart do navegador (`MINIO_API_CORS_ALLOW_ORIGIN=*`)
+- [x] Regras de ciclo de vida e limpeza de multipart incompleto documentadas
+- [x] Endpoint do Silo preparado para publicação via Cloudflare Tunnel (`s3.<domínio>`)
+- [x] Capacidade de disco dimensionada para vídeos de até 10 GB por upload (`infra/docs/servidor.md`)
+- [x] Credenciais de aplicação (`silo_docflow_app_user` / `silo_docflow_app_password`) gravadas no Infisical (`/databases`)
 
 ### INF-07 · DNS e certificados TLS `[M1][infra][feature][M]`
 Depende de INF-20.

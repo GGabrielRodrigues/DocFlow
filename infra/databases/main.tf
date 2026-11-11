@@ -1,5 +1,5 @@
 data "infisical_secrets" "databases_secrets" {
-  env_slug     = "dev"
+  env_slug     = "prod"
   workspace_id = var.infisical_workspace_id
   folder_path  = "/databases"
 }
