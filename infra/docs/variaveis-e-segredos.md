@@ -6,7 +6,7 @@ Este documento define a organização do **Infisical** nas 4 pastas corresponden
 
 ## 1. Contrato Estrito de `variables.tf` nos Root Modules
 
-Seguindo o padrão herdado do `agentrh-infra`, os arquivos `variables.tf` dos **Root Modules** (`<dominio>/development/variables.tf` e `<dominio>/production/variables.tf`) devem conter **exclusivamente** as variáveis de autenticação no Infisical e a variável opcional de override do socket Docker:
+Os arquivos `variables.tf` dos **Root Modules** (`<dominio>/variables.tf`) devem conter **exclusivamente** as variáveis de autenticação no Infisical e a variável opcional de override do socket Docker:
 
 ```hcl
 # Infisical Universal Auth
@@ -36,7 +36,7 @@ variable "docker_host" {
 ```
 
 ### Template `terraform.tfvars.example`
-Em cada pasta `development/` e `production/`, o arquivo `terraform.tfvars.example` versionado contém apenas o esqueleto sem valores:
+Em cada domínio (`infra/<dominio>/`), o arquivo `terraform.tfvars.example` versionado contém apenas o esqueleto sem valores:
 
 ```hcl
 infisical_client_id     = ""
@@ -46,16 +46,12 @@ infisical_workspace_id  = ""
 
 ---
 
-## 2. Estrutura de Ambientes e Pastas no Infisical
+## 2. Estrutura de Pastas no Infisical
 
-No projeto **DocFlow** dentro do Infisical, utilizamos os ambientes:
-- `dev` (consumido pelos diretórios `<dominio>/development`)
-- `prod` (consumido pelos diretórios `<dominio>/production`)
-
-Dentro de cada ambiente, os segredos são divididos em **4 pastas temáticas** que espelham exatamente os 4 domínios de `infra/`:
+No projeto **DocFlow** dentro do Infisical (`env_slug = "prod"`), os segredos são divididos em **4 pastas temáticas** que espelham exatamente os 4 domínios de `infra/`:
 
 ```text
-Infisical Project: DocFlow (ambientes: dev | prod)
+Infisical Project: DocFlow (env_slug: prod)
 ├── /databases       # Postgres, Redis, Silo (S3) + conectividade Docker/GHCR
 ├── /apps            # Aplicações próprias: docflow-web e docflow-server (API + Workers + IA)
 ├── /tools           # Ferramentas: pgAdmin e Portainer
@@ -67,13 +63,13 @@ Cada Root Module lê a pasta do seu próprio domínio e, quando precisa de crede
 
 ```hcl
 data "infisical_secrets" "databases_secrets" {
-  env_slug     = "dev" # ou "prod"
+  env_slug     = "prod"
   workspace_id = var.infisical_workspace_id
   folder_path  = "/databases"
 }
 
 data "infisical_secrets" "apps_secrets" {
-  env_slug     = "dev" # ou "prod"
+  env_slug     = "prod"
   workspace_id = var.infisical_workspace_id
   folder_path  = "/apps"
 }
@@ -96,7 +92,7 @@ Credenciais do PostgreSQL, Redis, Silo (S3), além das credenciais base do daemo
 | `postgres_db` | Nome do banco de dados principal do DocFlow | `databases/modules/postgres`, `apps/modules/server` |
 | `postgres_user` | Usuário administrador do PostgreSQL | `databases/modules/postgres`, `apps/modules/server` |
 | `postgres_password` | Senha do usuário do PostgreSQL | `databases/modules/postgres`, `apps/modules/server` |
-| `redis_password` | Senha de autenticação do Redis (`shared-redis`) | `databases/modules/redis`, `apps/modules/server` |
+| `redis_password` | Senha de autenticação do Redis (`redis`) | `databases/modules/redis`, `apps/modules/server` |
 | `redis_port` | Porta interna do Redis (padrão `6379`) | `databases/modules/redis`, `apps/modules/server` |
 | `redis_memory_limit` | Limite de memória RAM do container Redis (em MB) | `databases/modules/redis` |
 | `redis_cpu_limit` | Quota de CPU do container Redis | `databases/modules/redis` |
@@ -135,9 +131,10 @@ Credenciais administrativas para pgAdmin e Portainer.
 | `pgadmin_default_password` | Senha de login inicial do pgAdmin 4 | `tools/modules/pgadmin` |
 | `pgadmin_port` | Porta de acesso ao pgAdmin | `tools/modules/pgadmin` |
 | `pgadmin_image_tag` | Tag da imagem do pgAdmin (`dpage/pgadmin4`) | `tools/modules/pgadmin` |
-| `portainer_port` | Porta HTTPS do Portainer | `tools/modules/portainer` |
-| `portainer_tunnel_port` | Porta do Edge Agent do Portainer | `tools/modules/portainer` |
-| `portainer_license_key` | Chave de licença do Portainer (se Business/EE) | `tools/modules/portainer` |
+| `portainer_port` | Porta HTTP/UI do Portainer (ex.: `9000`) | `tools/modules/portainer` |
+| `portainer_tunnel_port` | Porta do Edge Agent do Portainer (ex.: `8000`) | `tools/modules/portainer` |
+| `portainer_db_connection_url` | String de conexão opcional de banco para o Portainer (pode ser `""`) | `tools/modules/portainer` |
+| `portainer_license_key` | Chave de licença do Portainer EE (ou `""`) | `tools/modules/portainer` |
 
 ### 3.4. Pasta `/observability`
 Credenciais e parâmetros para Grafana, Grafana Loki e Grafana Alloy.

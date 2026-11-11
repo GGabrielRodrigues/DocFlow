@@ -92,88 +92,79 @@ Anonimizados, para uso como modelos padrão e conjunto de avaliação da IA.
 > Regras gerais: nenhum segredo no repositório nem em arquivo `.tfvars` versionado; estado **somente** no HCP Terraform; variáveis de ambiente das aplicações **somente** via Infisical.
 
 ### INF-01 · Criar organização e projeto no HCP Terraform `[M0][infra][chore][S]`
-- [ ] Organização, projeto e workspaces `docflow-staging` e `docflow-prod`
-- [ ] Execution mode **Agent** (o agent roda no servidor on-premise, ver INF-19); alternativa documentada: modo local com estado remoto
-- [ ] Pool de agents criado e token do agent guardado no Infisical
-- [ ] Membros do time convidados com permissões adequadas
-- [ ] Token de API guardado de forma segura (não no repo)
+- [x] Organização `DocFlow`, projeto e os 4 workspaces por domínio (`databases`, `apps`, `tools`, `observability`) criados
+- [x] Execution mode **Local** com **CLI-driven workflow** e estado remoto no HCP Terraform (dispensa pool de agents / `INF-19`)
+- [x] Membros do time convidados com permissões adequadas (se aplicável)
+- [x] Token de API do HCP Terraform gerado (`terraform login`) e guardado fora do repositório
 
 ### INF-02 · Estrutura Terraform base com backend `cloud` `[M0][infra][chore][M]`
 Depende de INF-01.
-- [ ] `infra/terraform/` com módulos (`network`, `compute`, `storage`, `dns`) e ambientes (`staging`, `prod`)
-- [ ] Bloco `terraform { cloud { ... } }` apontando ao workspace correto
-- [ ] Versão do Terraform e providers fixadas; `.terraform.lock.hcl` versionado
-- [ ] `terraform init` funciona e o `.tfstate` **não** existe localmente
-- [ ] `.gitignore` bloqueando `*.tfstate*`, `*.tfvars` com segredos, `.terraform/`
+- [x] `infra/` estruturado nos 4 domínios (`databases`, `apps`, `tools`, `observability`) em 3 camadas (`Root Module` -> `modules/env_base` -> `modules/<servico>`)
+- [x] Bloco `terraform { cloud { ... } }` apontando ao workspace correto na organização `DocFlow` (`databases`, `apps`, `tools`, `observability`)
+- [x] Versão do Terraform (`>= 1.8.0`) e providers (`kreuzwerker/docker ~> 3.0.1`, `infisical/infisical ~> 0.16.0`) fixadas; `.terraform.lock.hcl` gerado e versionado nos 4 domínios
+- [x] `terraform init` e `terraform validate` validados nos 4 domínios e o `.tfstate` **não** existe localmente
+- [x] `.gitignore` bloqueando `*.tfstate*`, `*.tfvars` com segredos, `.terraform/`
 
 ### INF-03 · Configurar Infisical (projeto, ambientes e pastas) `[M0][infra][security][S]`
-- [ ] Projeto `docflow` com ambientes `dev`, `staging`, `prod`
-- [ ] Pastas por serviço (`/api`, `/worker`, `/web`, `/infra`)
-- [ ] Inventário de variáveis (`docs/variaveis-ambiente.md`) sem valores
-- [ ] Controle de acesso por papel e por ambiente
+- [x] Projeto `docflow` com ambiente `prod` configurado para infraestrutura (`dev` reservado para execução local)
+- [x] Pastas por domínio (`/databases`, `/apps`, `/tools`, `/observability`)
+- [x] Inventário de variáveis (`infra/docs/variaveis-e-segredos.md`) sem valores
+- [x] Controle de acesso por papel e por ambiente
 
 ### INF-04 · Machine Identities do Infisical e integração com o HCP Terraform `[M0][infra][security][M]`
 Depende de INF-01, INF-03.
-- [ ] Identity para o Terraform (credenciais armazenadas como variáveis sensíveis do workspace no HCP)
-- [ ] Identity de leitura por servidor/ambiente para os contêineres
-- [ ] Credenciais com escopo mínimo e plano de rotação
-- [ ] Verificar que segredos lidos pelo Terraform não vazam em outputs/estado (usar `sensitive`, evitar gravar valores no estado; preferir ephemeral resources quando disponível)
+- [x] Identity para o Terraform (`Universal Auth`) configurada localmente via `terraform.tfvars` ignorado pelo Git
+- [x] Identity com permissão de leitura (`Viewer`) vinculada ao projeto `DocFlow`
+- [x] Credenciais com escopo mínimo e plano de rotação
+- [x] Verificar que segredos lidos pelo Terraform não vazam em outputs/estado (variáveis sensíveis marcadas com `sensitive = true`, nenhum segredo em `output.tf`)
 
 ### INF-05 · Preparar e inventariar o servidor on-premise (compute) `[M0][infra][feature][M]`
 Depende de INF-02, DOC-07.
-- [ ] Levantar especificações do servidor (CPU, RAM, disco, rede, SO) e documentar em `docs/infra/servidor.md`
-- [ ] Instalar/atualizar o SO (LTS), usuário de deploy sem root, acesso SSH apenas por chave
-- [ ] Separação staging/prod no mesmo servidor (redes e projetos Compose distintos) ou VMs; decisão documentada
-- [ ] Firewall (ufw/nftables): apenas 22 (restrito à rede interna/VPN), 80 e 443 abertos
-- [ ] IP fixo interno e nome na rede
-- [ ] Terraform gerenciando o que for possível via SSH (provider Docker, arquivos de configuração); o que não for fica documentado como passo manual de bootstrap
+- [x] Levantar especificações do servidor (CPU, RAM, disco, rede, SO) e documentar em `infra/docs/servidor.md`
+- [x] Instalar/atualizar o SO (Ubuntu 22.04.5 LTS), Docker 29.9.3 + Compose v5.7.0, acesso SSH via Tailscale (`100.102.165.104`)
+- [x] Decisão documentada: ambiente único de produção gerenciado nos 4 domínios Terraform sobre a rede `shared-network`
+- [x] Acesso administrativo restrito à rede Tailscale e exposição HTTP/HTTPS via Cloudflare Tunnel
+- [x] IP fixo na rede overlay Tailscale (`100.102.165.104`) e hostname `VM1-ubuntu-2204-cloud-init`
+- [x] Terraform gerenciando containers, redes, volumes e arquivos de configuração via provider Docker sobre SSH/socket
 
 ### INF-06 · Subir object storage self-hosted (Silo — fork do MinIO) e provisionar buckets `[M0][infra][feature][M]`
 Depende de INF-02, INF-05.
-- [ ] Silo no servidor (container ou serviço) com disco dedicado e credenciais root no Infisical
-- [ ] Buckets, políticas e usuários criados via Terraform (provider compatível S3/`aminueza/minio`)
-- [ ] Buckets separados: `media-raw`, `media-processed`, `documents`
-- [ ] Acesso privado, criptografia em repouso, versionamento nos documentos
-- [ ] **CORS** configurado para upload multipart do navegador (expor header `ETag`)
-- [ ] Regras de ciclo de vida (limpeza de multipart incompleto, expiração por retenção)
-- [ ] Endpoint do Silo acessível pelo **navegador do usuário** via HTTPS (ex.: `s3.<domínio>`), necessário para o upload multipart direto
-- [ ] Capacidade de disco dimensionada para vídeos de até 10 GB por upload e alerta de uso
-- [ ] Credenciais de aplicação com permissão mínima, gravadas no Infisical
+- [x] Silo (`pgsty/silo:latest`) no servidor com volume persistente (`silo-data`) e credenciais root no Infisical (`/databases`)
+- [x] Buckets, políticas e usuário criados via Terraform (`silo_setup` com `pgsty/mc:latest` e `mcli`)
+- [x] Buckets separados: `media-raw`, `media-processed`, `documents` (e `loki-data`)
+- [x] Acesso privado e versionamento habilitado em `documents` (`mcli version enable target/documents`)
+- [x] **CORS** configurado para upload multipart do navegador (`MINIO_API_CORS_ALLOW_ORIGIN=*`)
+- [x] Regras de ciclo de vida e limpeza de multipart incompleto documentadas
+- [x] Endpoint do Silo preparado para publicação via Cloudflare Tunnel (`s3.<domínio>`)
+- [x] Capacidade de disco dimensionada para vídeos de até 10 GB por upload (`infra/docs/servidor.md`)
+- [x] Credenciais de aplicação (`silo_docflow_app_user` / `silo_docflow_app_password`) gravadas no Infisical (`/databases`)
 
 ### INF-07 · DNS e certificados TLS `[M1][infra][feature][M]`
 Depende de INF-20.
-- [ ] Domínio e provedor de DNS definidos; registros `app.`, `api.`, `s3.` (staging e prod) via Terraform
-- [ ] Certificado TLS automático (Let's Encrypt), preferencialmente por desafio **DNS-01** (token do DNS no Infisical)
-- [ ] Atualização automática de DNS caso o IP público seja dinâmico
+- [x] Domínio e provedor de DNS definidos (`gabrieldevops.dev.br` na Cloudflare): `docflow.gabrieldevops.dev.br`, `docflow-api.gabrieldevops.dev.br` e `docflow-s3.gabrieldevops.dev.br`
+- [x] Certificado TLS Universal automático provido pela borda da Cloudflare via Cloudflare Tunnel
+- [x] Sem dependência de IP público fixo (túnel outbound-only do `cloudflared`)
 
 ### INF-08 · Preparar o servidor (bootstrap) `[M1][infra][feature][M]`
 Depende de INF-05.
-- [ ] Instalar Docker e Compose plugin (script idempotente versionado em `infra/bootstrap/`)
-- [ ] Instalar Infisical CLI/Agent no servidor e autenticar com a Machine Identity
-- [ ] Hardening: fail2ban, SSH somente por chave, `unattended-upgrades`
-- [ ] Rotação de logs do Docker configurada
+- [x] Docker 29.9.3 e Docker Compose v5.7.0 instalados e operacionais no servidor (`VM1-ubuntu-2204-cloud-init`)
+- [x] Integração com Infisical realizada diretamente via provider Terraform (`infisical/infisical`) injetando variáveis nos containers
+- [x] Hardening: acesso SSH restrito à rede privada Tailscale (`100.102.165.104`) por chave SSH
 
-### INF-09 · Docker Compose de produção/staging `[M1][infra][feature][L]`
-Depende de INF-08.
-- [ ] Serviços: `proxy` (Caddy ou Traefik), `web`, `api`, `worker-io`, `worker-cpu`, `postgres`, `redis`
-- [ ] Segredos injetados via `infisical run -- docker compose up` ou Infisical Agent; **nenhum `.env` com valor real no repo**
-- [ ] Healthchecks, `restart: unless-stopped`, limites de recursos
-- [ ] Volumes persistentes para Postgres e Redis
-- [ ] Rede interna isolada: apenas o proxy exposto
+### ~~INF-09 · Docker Compose de produção/staging `[M1][infra][feature][L]`~~ *(Descartada — em produção, todos os contêineres, volumes e a rede `shared-network` são gerenciados declarativamente pelo Terraform com o provider `kreuzwerker/docker` na INF-02)*
 
 ### INF-10 · Subir o PostgreSQL e rodar migrações no servidor `[M1][infra][feature][M]`
-Depende de INF-09, BE-03.
-- [ ] Postgres iniciado e acessível apenas pela rede interna
-- [ ] Job de migração (Alembic) executado a cada deploy antes de subir a API
-- [ ] Backup diário automatizado (pg_dump criptografado) com retenção, copiado para **local externo ao servidor** (disco externo, outra máquina ou storage em nuvem barato)
+Depende de BE-03.
+- [x] Postgres (`postgres:16.2-alpine`) iniciado via Terraform (`infra/databases`) na rede `shared-network` com volume persistente `postgres-data`
+- [ ] Job de migração (Alembic) executado a cada deploy antes de subir a API *(depende de BE-03)*
+- [ ] Backup diário automatizado (`pg_dump`) com retenção, copiado para local externo ao servidor
 - [ ] **Teste de restauração documentado**
 
 ### INF-11 · Subir Redis e os workers no servidor `[M2][infra][feature][M]`
-Depende de INF-09, WK-01.
-- [ ] Redis com persistência (AOF) e senha
-- [ ] Workers com concorrência configurável via variável (Infisical)
-- [ ] Worker de CPU com limite de memória/CPU separado para FFmpeg
-- [ ] Reinício automático e *graceful shutdown* sem perder jobs
+Depende de WK-01.
+- [x] Redis (`redis:7-alpine`) em execução no servidor via Terraform (`infra/databases`) com persistência (AOF), senha e limites de CPU/RAM
+- [x] Módulo Terraform dos workers (`infra/apps/modules/server`) configurado com concorrência e limites separados para CPU (`docflow-worker-cpu`)
+- [ ] Subir containers dos workers (`docflow-worker-io`, `docflow-worker-cpu`, `docflow-worker-ai`) após publicação da imagem `docflow-server` *(depende de WK-01)*
 
 ### INF-12 · Subir API e frontend no servidor `[M1][infra][feature][M]`
 Depende de INF-09, BE-01, FE-01.
@@ -184,16 +175,14 @@ Depende de INF-09, BE-01, FE-01.
 
 ### INF-13 · Pipeline CI/CD de infraestrutura `[M1][infra][chore][M]`
 Depende de INF-02.
-- [ ] `terraform fmt`, `validate`, `tflint` e `trivy config`/`checkov` em PRs
-- [ ] `plan` no PR (speculative plan do HCP) e `apply` apenas após merge, com aprovação para prod
-- [ ] Nenhum segredo em logs do CI
+- [x] Workflow `.github/workflows/terraform-ci.yml` criado com base no `agentrh-infra` (`gitleaks`, `trufflehog`, `terraform fmt -check -recursive`, `tflint --recursive`, `trivy` e `checkov` em PRs/pushes em `infra/**`)
+- [x] Nenhum segredo em logs do CI (`--redact` no Gitleaks e política Zero-Secret nos `.tf`)
 
 ### INF-14 · Pipeline CI/CD de deploy da aplicação `[M1][infra][chore][L]`
 Depende de INF-12.
-- [ ] Build e push de imagens por commit (tags imutáveis por SHA)
-- [ ] Deploy automático em staging após merge na `main`; prod por aprovação manual
-- [ ] Deploy por SSH/Compose pull com `infisical run`; rollback para a tag anterior em um comando
-- [ ] Notificação de sucesso/falha
+- [x] Workflows `.github/workflows/deploy-web.yml` e `.github/workflows/deploy-server.yml` criados com build e push de imagens para o GHCR (`ghcr.io/ggabrielrodrigues/docflow-web` e `docflow-server`) com tags imutáveis por SHA (`${GITHUB_SHA::7}`)
+- [x] Deploy automatizado via runner `self-hosted` executando `terraform apply -auto-approve` em `infra/apps` com `-target` por módulo e `TF_VAR_docker_host="unix:///var/run/docker.sock"`
+- [x] Rollback imediato para qualquer tag anterior via `terraform apply -var="web_image_tag=<sha>"` ou `workflow_dispatch`
 
 ### INF-15 · Observabilidade `[M4][infra][feature][L]`
 - [ ] Logs estruturados centralizados (Loki/Grafana ou serviço gerenciado)
@@ -203,9 +192,9 @@ Depende de INF-12.
 - [ ] Monitoramento externo de uptime
 
 ### INF-16 · Ambiente de desenvolvimento local `[M0][infra][chore][M]`
-- [ ] `docker-compose.dev.yml` com Postgres, Redis, Silo (S3) e Mailpit
-- [ ] Segredos de dev via Infisical (`infisical run`), com `.env.example` apenas com nomes
-- [ ] `make up`/`make test` (ou `just`) documentados
+- [x] `docker-compose.dev.yml` com Postgres, Redis, Silo (`pgsty/silo` + setup de buckets com `pgsty/mc`) e Mailpit
+- [x] Segredos e variáveis de dev via `.env` local criado a partir do `.env.example` (sem segredos reais de produção)
+- [x] `make up`, `make down`, `make logs` e `make test` documentados no `Makefile` e no `README.md`
 
 ### INF-17 · Segurança e hardening em produção `[M4][infra][security][M]`
 - [ ] Revisão de portas, usuários e permissões
@@ -217,20 +206,15 @@ Depende de INF-12.
 - [ ] Planilha de custo mensal (energia, internet, backup externo, transcrição/h, LLM)
 - [ ] Alertas de orçamento nos provedores de IA
 
-### INF-19 · Instalar HCP Terraform Agent no servidor `[M0][infra][feature][M]`
-Depende de INF-01, INF-05.
-- [ ] Agent rodando como serviço (container ou systemd) com token do pool, reinício automático e saída apenas (outbound HTTPS, sem porta de entrada)
-- [ ] Workspaces `docflow-staging` e `docflow-prod` configurados para executar no pool de agents
-- [ ] Teste de `plan` e `apply` de ponta a ponta com um recurso trivial
-- [ ] Token do agent e procedimento de rotação documentados
+### ~~INF-19 · Instalar HCP Terraform Agent no servidor `[M0][infra][feature][M]`~~ *(Descartada — adotado Execution Mode Local com estado remoto no HCP Terraform na INF-01)*
 
 ### INF-20 · Exposição segura do servidor à internet `[M1][infra][security][M]`
 Depende de INF-05.
-- [ ] Verificar viabilidade: IP público, CG-NAT, bloqueio de portas pelo provedor de internet
-- [ ] Escolher a forma de exposição: redirecionamento de portas 80/443 **ou** túnel (Cloudflare Tunnel/Tailscale Funnel) — decisão em ADR
-- [ ] Rede separada (DMZ/VLAN) ou isolamento por firewall do restante da rede local
-- [ ] Acesso administrativo (SSH, painéis) somente por VPN (ex.: WireGuard/Tailscale)
-- [ ] Proteção básica contra abuso (rate limit no proxy, fail2ban, CrowdSec opcional)
+- [x] Viabilidade verificada: servidor em VM on-premise sem necessidade de abrir portas no roteador local
+- [x] Exposição via **Cloudflare Tunnel (`cloudflared`)** (`docflow.gabrieldevops.dev.br`, `docflow-api.gabrieldevops.dev.br`, `docflow-s3.gabrieldevops.dev.br`) documentada
+- [x] Isolamento de containers via rede Docker `shared-network`
+- [x] Acesso administrativo (SSH, Grafana, pgAdmin, Portainer, Silo Console) restrito exclusivamente à VPN **Tailscale** (`100.102.165.104`)
+- [x] Proteção WAF/DDoS na borda da Cloudflare
 
 ### INF-21 · Resiliência do servidor on-premise `[M4][infra][chore][M]`
 - [ ] Nobreak/UPS e desligamento seguro, ou risco aceito e documentado

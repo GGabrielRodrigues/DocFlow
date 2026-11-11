@@ -1,0 +1,78 @@
+name: Terraform CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+      - ".github/workflows/terraform-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "infra/**"
+      - ".github/workflows/terraform-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    name: Static Checks (Format & Security)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Secret Scan (CLI)
+        run: |
+          wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz
+          tar -zxvf gitleaks_8.18.2_linux_x64.tar.gz gitleaks
+          ./gitleaks detect --source=".." --gitleaks-ignore-path=".gitleaksignore" --verbose --redact
+
+      - name: TruffleHog Secret Scan
+        run: |
+          docker run --rm -v "${GITHUB_WORKSPACE}/infra:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir --exclude-paths=/workdir/.trufflehogignore --fail
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.54.0
+
+      - name: Run TFLint
+        run: tflint --recursive
+
+      - name: Run Trivy Security & Secrets Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "infra"
+          scanners: "misconfig,secret"
+          hide-progress: false
+          format: "table"
+          exit-code: "1" # Falha o job caso encontre vulnerabilidades críticas ou altas de infraestrutura/secrets
+          ignore-unfixed: true
+          severity: "CRITICAL,HIGH"
+
+      - name: Run Checkov IaC & Secret Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infra
+          framework: terraform,secrets
+          enable_secrets_scan_all_files: "true"
+          output_format: cli
+          soft_fail: false

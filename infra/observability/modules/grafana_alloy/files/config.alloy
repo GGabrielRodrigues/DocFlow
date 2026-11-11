@@ -1,0 +1,45 @@
+// 1. Descoberta de contêineres Docker via socket local
+discovery.docker "all_containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// 2. Filtro e relabeling para coletar apenas contêineres das redes do projeto
+discovery.relabel "project_containers" {
+  targets = discovery.docker.all_containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_network_name"]
+    regex         = "${docker_networks_regex}"
+    action        = "keep"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_network_name"]
+    target_label  = "network"
+  }
+
+  rule {
+    target_label = "project"
+    replacement  = "${project_name}"
+  }
+}
+
+// 3. Coleta dos logs dos contêineres filtrados via stream do Docker
+loki.source.docker "docker_logs" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.project_containers.output
+  forward_to = [loki.write.loki_endpoint.receiver]
+}
+
+// 4. Encaminhamento dos logs para o Grafana Loki
+loki.write "loki_endpoint" {
+  endpoint {
+    url = "${loki_url}/loki/api/v1/push"
+  }
+}

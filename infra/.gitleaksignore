@@ -1,0 +1,5 @@
+# Gitleaks ignore file — DocFlow Infrastructure (Falsos positivos de variáveis Terraform)
+f5e3769fc476569a476976c5bc39df6ffeb27888:infra/observability/modules/env_base/main.tf:generic-api-key:24
+f5e3769fc476569a476976c5bc39df6ffeb27888:infra/observability/modules/grafana_loki/main.tf:generic-api-key:42
+f5e3769fc476569a476976c5bc39df6ffeb27888:observability/modules/env_base/main.tf:generic-api-key:24
+f5e3769fc476569a476976c5bc39df6ffeb27888:observability/modules/grafana_loki/main.tf:generic-api-key:42

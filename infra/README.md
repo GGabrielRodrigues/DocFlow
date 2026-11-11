@@ -3,6 +3,7 @@
 Diretório de **Infraestrutura como Código (IaC)** do **DocFlow**. Gerencia de forma declarativa, modular e automatizada os bancos de dados, aplicações próprias, ferramentas operacionais e observabilidade no servidor **on-premise**, com exposição externa via **Cloudflare Tunnel**.
 
 > **Documentação Técnica do Módulo (`infra/docs/`):**
+> - [`docs/servidor.md`](./docs/servidor.md) — Especificações de hardware, SO, rede (Tailscale) e dimensionamento do servidor on-premise (`INF-05`).
 > - [`docs/catalogo-modulos.md`](./docs/catalogo-modulos.md) — Catálogo dos 4 domínios (`databases`, `apps`, `tools`, `observability`), mapeamento dos 2 `Dockerfile`s para os submódulos de `apps`, rede `shared-network` e **Cloudflare Tunnel** (DNS + TLS).
 > - [`docs/variaveis-e-segredos.md`](./docs/variaveis-e-segredos.md) — Estrutura de pastas no **Infisical** (`/databases`, `/apps`, `/tools`, `/observability`), inventário de variáveis e contratos de `variables.tf`.
 > - [`AGENTS.md`](./AGENTS.md) — Guia de regras estritas e passo a passo para criação/manutenção de módulos Terraform.
@@ -40,7 +41,7 @@ flowchart TD
   INF["Infisical Platform\nUniversal Auth (Machine Identity)\nPastas: /databases, /apps, /tools, /observability"]
   SOCK["Docker Engine no Servidor On-Premise\nkreuzwerker/docker (~> 3.0.1)\nSocket local: unix:///var/run/docker.sock\nou SSH remoto: docker_ssh_host"]
   CF["Cloudflare Edge (DNS + TLS/HTTPS)\nCloudflare Tunnel"]
-  NET["Rede Docker Interna: shared-network\n(postgres, shared-redis, silo,\ndocflow-web, docflow-api, docflow-workers,\npgadmin, portainer, grafana, loki, alloy)"]
+  NET["Rede Docker Interna: shared-network\n(postgres, redis, silo,\ndocflow-web, docflow-api, docflow-workers,\npgadmin, portainer, grafana, loki, alloy)"]
 
   HCP <-->|Remote State & Locking| TF
   TF -->|Lê segredos via data.infisical_secrets| INF
@@ -51,17 +52,17 @@ flowchart TD
 
 ### 2.1. Declaração Canônica de Providers e Backend (`provider.tf`)
 
-Nos Root Modules (`<dominio>/development/provider.tf` e `<dominio>/production/provider.tf`), utiliza-se o bloco `cloud` do HCP Terraform aliado aos providers `kreuzwerker/docker` e `infisical/infisical`:
+Nos Root Modules (`<dominio>/provider.tf`), utiliza-se o bloco `cloud` do HCP Terraform aliado aos providers `kreuzwerker/docker` e `infisical/infisical`:
 
 ```hcl
 terraform {
   required_version = ">= 1.8.0"
 
   cloud {
-    organization = "<sua-organizacao-hcp>"
+    organization = "DocFlow"
 
     workspaces {
-      name = "<nome-do-dominio>" # ex: "databases", "apps", "tools", "observability"
+      name = "<nome-do-dominio>" # "databases", "apps", "tools" ou "observability"
     }
   }
 
@@ -115,30 +116,42 @@ infra/
 │   │   ├── redis/                  # Redis com limites de CPU/RAM e AOF
 │   │   ├── silo/                   # Silo (fork do MinIO S3-compatível) + setup de buckets/usuários
 │   │   └── env_base/               # Orquestrador de databases + criação da shared-network
-│   ├── development/                # Root Module (dev): lê Infisical (/databases) e instancia env_base
-│   └── production/                 # Root Module (prod): lê Infisical (/databases) e instancia env_base
+│   ├── main.tf                     # Root Module: lê Infisical (/databases e /observability) e instancia env_base
+│   ├── provider.tf                 # Backend HCP Terraform (workspace: databases) + providers docker/infisical
+│   ├── variables.tf                # Contrato de variáveis (Infisical Auth + docker_host)
+│   ├── output.tf                   # Outputs do domínio
+│   └── terraform.tfvars.example    # Exemplo de preenchimento das credenciais do Infisical
 ├── apps/                           # 2. Domínio das Aplicações desenvolvidas por nós (2 Dockerfiles = 2 submódulos)
 │   ├── modules/
 │   │   ├── web/                    # Frontend React + Nginx (imagem gerada por apps/web/Dockerfile)
 │   │   ├── server/                 # Backend FastAPI + Workers Celery (imagem única de apps/server/Dockerfile)
 │   │   └── env_base/               # Orquestrador das aplicações DocFlow
-│   ├── development/                # Root Module (dev): lê Infisical (/apps e /databases)
-│   └── production/                 # Root Module (prod): lê Infisical (/apps e /databases)
+│   ├── main.tf                     # Root Module: lê Infisical (/apps e /databases) e instancia env_base
+│   ├── provider.tf                 # Backend HCP Terraform (workspace: apps) + providers docker/infisical
+│   ├── variables.tf
+│   ├── output.tf
+│   └── terraform.tfvars.example
 ├── tools/                          # 3. Domínio de Ferramentas Operacionais e Apoio
 │   ├── modules/
 │   │   ├── pgadmin/                # Gestão web do PostgreSQL
 │   │   ├── portainer/              # Gestão visual dos contêineres Docker
 │   │   └── env_base/               # Orquestrador de ferramentas
-│   ├── development/                # Root Module (dev): lê Infisical (/tools e /databases)
-│   └── production/                 # Root Module (prod): lê Infisical (/tools e /databases)
+│   ├── main.tf                     # Root Module: lê Infisical (/tools e /databases) e instancia env_base
+│   ├── provider.tf                 # Backend HCP Terraform (workspace: tools) + providers docker/infisical
+│   ├── variables.tf
+│   ├── output.tf
+│   └── terraform.tfvars.example
 ├── observability/                  # 4. Domínio de Telemetria, Logs e Métricas
 │   ├── modules/
 │   │   ├── grafana/                # Dashboards e alertas
 │   │   ├── grafana_loki/           # Agregador de logs com backend S3 (Silo)
 │   │   ├── grafana_alloy/          # Coletor de logs/métricas dos containers
 │   │   └── env_base/               # Orquestrador de observabilidade
-│   ├── development/                # Root Module (dev): lê Infisical (/observability e /databases)
-│   └── production/                 # Root Module (prod): lê Infisical (/observability e /databases)
+│   ├── main.tf                     # Root Module: lê Infisical (/observability e /databases) e instancia env_base
+│   ├── provider.tf                 # Backend HCP Terraform (workspace: observability) + providers docker/infisical
+│   ├── variables.tf
+│   ├── output.tf
+│   └── terraform.tfvars.example
 ├── .gitleaksignore                 # Fingerprints de falsos positivos de segredos
 ├── .tflint.hcl                     # Configuração de regras de lint do Terraform
 ├── Makefile                        # Automação de qualidade e segurança (make check)
@@ -153,7 +166,7 @@ infra/
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│     1. Root Module (<dominio>/development ou production)│
+│     1. Root Module (<dominio>/)                         │
 │   - Autentica no Infisical e lê segredos da pasta       │
 │   - Configura o provider docker (socket ou SSH)         │
 │   - Configura o backend HCP Terraform via bloco cloud   │
@@ -164,7 +177,6 @@ infra/
 │     2. Orquestrador de Domínio (modules/env_base)       │
 │   - Cria (em databases) ou consome a shared-network     │
 │   - Instancia e conecta os submódulos de serviço        │
-│   - Garante paridade estrutural entre dev e prod        │
 └──────────────┬───────────────────────────┬──────────────┘
                │ Instancia                 │ Instancia
                ▼                           ▼
@@ -236,9 +248,9 @@ terraform login
 export TF_TOKEN_app_terraform_io="<seu_token_hcp_terraform>"
 ```
 
-### 2. Configurar as Credenciais do Infisical no Ambiente Desejado
+### 2. Configurar as Credenciais do Infisical no Domínio Desejado
 ```bash
-cd infra/databases/development
+cd infra/databases
 cp terraform.tfvars.example terraform.tfvars
 ```
 Preencha no `terraform.tfvars` (arquivo ignorado pelo `.gitignore`) apenas as 3 variáveis da Machine Identity do Infisical:
