@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,6 +11,68 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     host: str = "127.0.0.1"
     port: int = 8000
+    database_url: str = Field(
+        default="sqlite:///./docflow.db",
+        validation_alias=AliasChoices("DOCFLOW_DATABASE_URL", "DATABASE_URL"),
+    )
+
+    # SMTP / E-mail
+    smtp_host: str = Field(
+        default="localhost",
+        validation_alias=AliasChoices("DOCFLOW_SMTP_HOST", "SMTP_HOST"),
+    )
+    smtp_port: int = Field(
+        default=1025,
+        validation_alias=AliasChoices("DOCFLOW_SMTP_PORT", "SMTP_PORT"),
+    )
+    smtp_user: str = Field(
+        default="",
+        validation_alias=AliasChoices("DOCFLOW_SMTP_USER", "SMTP_USER"),
+    )
+    smtp_password: str = Field(
+        default="",
+        validation_alias=AliasChoices("DOCFLOW_SMTP_PASSWORD", "SMTP_PASSWORD"),
+    )
+    smtp_from_email: str = Field(
+        default="noreply@docflow.local",
+        validation_alias=AliasChoices("DOCFLOW_SMTP_FROM_EMAIL", "SMTP_FROM_EMAIL"),
+    )
+    smtp_use_tls: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("DOCFLOW_SMTP_USE_TLS", "SMTP_USE_TLS"),
+    )
+    smtp_use_ssl: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("DOCFLOW_SMTP_USE_SSL", "SMTP_USE_SSL"),
+    )
+    smtp_timeout: float = Field(
+        default=10.0,
+        validation_alias=AliasChoices("DOCFLOW_SMTP_TIMEOUT", "SMTP_TIMEOUT"),
+    )
+
+    # Redis / Celery
+    redis_url: str = Field(
+        default="redis://localhost:6379/0",
+        validation_alias=AliasChoices("DOCFLOW_REDIS_URL", "REDIS_URL"),
+    )
+    celery_broker_url: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("DOCFLOW_CELERY_BROKER_URL", "CELERY_BROKER_URL"),
+    )
+    celery_result_backend: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("DOCFLOW_CELERY_RESULT_BACKEND", "CELERY_RESULT_BACKEND"),
+    )
+    celery_task_always_eager: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("DOCFLOW_CELERY_TASK_ALWAYS_EAGER", "CELERY_TASK_ALWAYS_EAGER"),
+    )
+    celery_task_default_queue: str = Field(
+        default="io",
+        validation_alias=AliasChoices(
+            "DOCFLOW_CELERY_TASK_DEFAULT_QUEUE", "CELERY_TASK_DEFAULT_QUEUE"
+        ),
+    )
 
     model_config = SettingsConfigDict(
         env_prefix="DOCFLOW_",
