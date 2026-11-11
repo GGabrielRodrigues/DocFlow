@@ -30,9 +30,9 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 - [x] Templates de issue e de pull request em `.github/`
 
 ### DOC-02 · Versionar o documento de requisitos em `docs/` `[M0][docs][chore][S]`
-- [ ] RFs, RNFs e RNs em `docs/requisitos.md` com IDs estáveis (RF-xx, RNF-xx, RN-xx)
-- [ ] Pontos em aberto transformados em ADRs ou issues
-- [ ] Matriz de rastreabilidade inicial (requisito → issue)
+- [x] RFs, RNFs e RNs em `docs/docflow_requisitos.md` com IDs estáveis (RF-xx, RNF-xx, RN-xx)
+- [x] Pontos em aberto transformados em ADRs ou issues (e decisões consolidadas nos requisitos)
+- [x] Matriz de rastreabilidade inicial (requisito → issue)
 
 ### DOC-03 · ADR-001: Monorepo e organização de módulos `[M0][docs][S]`
 Registrar decisão, alternativas e consequências. Incluir a renomeação de "Negócios" para `docs/` e "Agentes" para `workers`.
@@ -275,7 +275,7 @@ Cobre RF-02, RNF-05, RN-04.
 
 ### BE-06 · Gestão de usuários e autorização (RBAC) `[M1][backend][feature][M]`
 Cobre RF-03, RF-04, RN-02, RN-03, RN-04.
-- [ ] CRUD de usuários pelo administrador; perfis (Administrador, Funcionário; permissão de validação)
+- [ ] CRUD de usuários pelo administrador; perfis (`Administrador`, `Funcionário`)
 - [ ] Impedir inativar/remover o último administrador
 - [ ] Dependência de autorização reutilizável (`require_role`, `require_permission`)
 
@@ -341,10 +341,10 @@ Cobre RF-21, RF-26, RN-09.
 ### BE-16 · Fluxo de validação e aprovação `[M3][backend][feature][M]`
 Cobre RF-24, RF-25, RN-06, RN-07, RN-08, RN-10.
 - [ ] Máquina de estados: Rascunho → Em validação → Aprovado/Devolvido
-- [ ] Autor não aprova o próprio documento (configurável por instituição)
+- [ ] A pessoa que solicitou a geração do documento atua como validadora (seja Administrador ou Funcionário, conforme RN-07)
 - [ ] Devolução exige justificativa
 - [ ] Bloquear aprovação com campos obrigatórios pendentes
-- [ ] Notificações (e-mail) ao validador/autor
+- [ ] Notificações (e-mail) ao validador/solicitante
 - [ ] Suíte extensa de testes de domínio (TDD)
 
 ### BE-17 · Revisão automática do documento `[M3][backend][feature][M]`
@@ -394,9 +394,9 @@ Cobre RF-30, RF-31, RN-14, RN-15, RNF-07.
 - [ ] Tratamento de falha e *dead letter* (fila de jobs falhados)
 
 ### WK-02 · Extração de metadados e validação de mídia `[M1][workers][feature][M]`
-Cobre RF-06.
-- [ ] `ffprobe`: duração, codecs, resolução, áudio presente
-- [ ] Rejeitar arquivo corrompido/sem áudio com mensagem clara
+Cobre RF-06, RN-05.
+- [ ] `ffprobe`: duração (validar limite máximo de 2h30), codecs, resolução, áudio presente
+- [ ] Rejeitar arquivo corrompido, sem áudio ou acima de 2h30 com mensagem clara
 
 ### WK-03 · Interface `TranscriptionProvider` + primeiro adaptador `[M2][workers][feature][L]`
 Cobre RF-10, RF-11. Depende de DOC-06.
@@ -519,8 +519,8 @@ Cobre RF-21, RF-22, RF-26. Depende de BE-15, BE-17.
 
 ### FE-14 · Fluxo de validação e exportação `[M3][frontend][feature][M]`
 Cobre RF-23, RF-24, RF-25. Depende de BE-16, BE-18.
-- [ ] Enviar para validação, aprovar, devolver com justificativa
-- [ ] Mensagens claras de bloqueio (campos pendentes, autoaprovação)
+- [ ] Enviar para validação, aprovar, devolver com justificativa (validação realizada pelo solicitante, seja Administrador ou Funcionário)
+- [ ] Mensagens claras de bloqueio (campos obrigatórios pendentes)
 - [ ] Exportar DOCX/PDF
 
 ### FE-15 · Dashboard, busca e auditoria `[M3][frontend][feature][M]`
