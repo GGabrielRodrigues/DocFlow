@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "📋 Backlog Completo do DocFlow"
+    url: "https://github.com/OWNER/REPO/blob/main/docs/backlog-issues.md"
+    about: "Consulte o planejamento completo das issues (M0 a M4) antes de abrir uma nova issue."

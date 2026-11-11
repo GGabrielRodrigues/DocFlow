@@ -23,11 +23,11 @@
 
 ### DOC-01 · Reorganizar o repositório como monorepo `[M0][docs][chore][S]`
 Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, `contracts`.
-- [ ] Estrutura de pastas criada e protótipo funcionando em `apps/web`
-- [ ] `README.md` raiz explicando módulos e como rodar
-- [ ] `CONTRIBUTING.md` com convenção de branches, commits (Conventional Commits) e PRs
-- [ ] `.gitignore` e `.editorconfig` raiz
-- [ ] Templates de issue e de pull request em `.github/`
+- [x] Estrutura de pastas criada e protótipo funcionando em `apps/web`
+- [x] `README.md` raiz explicando módulos e como rodar
+- [x] `CONTRIBUTING.md` com convenção de branches, commits (Conventional Commits) e PRs
+- [x] `.gitignore` e `.editorconfig` raiz
+- [x] Templates de issue e de pull request em `.github/`
 
 ### DOC-02 · Versionar o documento de requisitos em `docs/` `[M0][docs][chore][S]`
 - [ ] RFs, RNFs e RNs em `docs/requisitos.md` com IDs estáveis (RF-xx, RNF-xx, RN-xx)

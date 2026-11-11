@@ -1,25 +1,21 @@
-# figma-make-app
+# DocFlow Monorepo
 
-React + Vite + Tailwind CSS project running inside Figma Make.
-
-## Development Server
-
-A Vite development server is **already running** on `$PORT` (default 8443). You don't need to start it manually.
-
-- Preview URL: The user can access the running app through the preview panel
-- Hot reload: Changes to source files are reflected immediately
+Monorepo do **DocFlow** (React + Vite + Tailwind CSS em `apps/web`, backend FastAPI + Celery em `apps/server`, contratos em `contracts/`, infraestrutura em `infra/` e documentação em `docs/`).
 
 ## Project Structure
 
 This is the canonical project structure. Start with task-relevant files below. Only follow imports or inspect other files when required, when a documented path is missing, or when the repository contradicts this guide.
 
-- `src/main.tsx` - React entrypoint; imports `src/index.css` and mounts `src/App.tsx` into the `#root` element
-- `src/App.tsx` - Primary application component and the usual starting point for UI work
-- `src/index.css` - Global CSS entrypoint and Tailwind CSS v4 import
-- `index.html` - Vite HTML shell containing the `#root` element and loading `src/main.tsx`
-- `package.json` - Project dependencies and the Vite build, development, preview, and formatting scripts
-- `vite.config.ts` - Vite configuration with React, Tailwind CSS v4, and Figma Make plugins plus the `@` alias for `src`
-- `.mise.toml` - Toolchain versions for Node.js and pnpm
+- `apps/web/src/main.tsx` - React entrypoint; imports `src/index.css` and mounts `src/App.tsx` into the `#root` element
+- `apps/web/src/App.tsx` - Primary application component and the usual starting point for UI work
+- `apps/web/src/index.css` - Global CSS entrypoint and Tailwind CSS v4 import
+- `apps/web/index.html` - Vite HTML shell containing the `#root` element and loading `src/main.tsx`
+- `apps/web/package.json` - Project dependencies and the Vite build, development, preview, and formatting scripts
+- `apps/web/vite.config.ts` - Vite configuration with React, Tailwind CSS v4, and Figma Make plugins plus the `@` alias for `src`
+- `apps/server/` - Python 3.12+ / FastAPI modular monolith and Celery workers
+- `contracts/` - Shared API contracts (OpenAPI)
+- `infra/` - Infrastructure as Code (Terraform, Docker Compose, bootstrap)
+- `docs/` - Requirements, ADRs, domain model, and backlog (`docs/backlog-issues.md`)
 
 ## Dependencies
 
