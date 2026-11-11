@@ -141,38 +141,30 @@ Depende de INF-02, INF-05.
 
 ### INF-07 · DNS e certificados TLS `[M1][infra][feature][M]`
 Depende de INF-20.
-- [ ] Domínio e provedor de DNS definidos; registros `app.`, `api.`, `s3.` (staging e prod) via Terraform
-- [ ] Certificado TLS automático (Let's Encrypt), preferencialmente por desafio **DNS-01** (token do DNS no Infisical)
-- [ ] Atualização automática de DNS caso o IP público seja dinâmico
+- [x] Domínio e provedor de DNS definidos (`gabrieldevops.dev.br` na Cloudflare): `docflow.gabrieldevops.dev.br`, `docflow-api.gabrieldevops.dev.br` e `docflow-s3.gabrieldevops.dev.br`
+- [x] Certificado TLS Universal automático provido pela borda da Cloudflare via Cloudflare Tunnel
+- [x] Sem dependência de IP público fixo (túnel outbound-only do `cloudflared`)
 
 ### INF-08 · Preparar o servidor (bootstrap) `[M1][infra][feature][M]`
 Depende de INF-05.
-- [ ] Instalar Docker e Compose plugin (script idempotente versionado em `infra/bootstrap/`)
-- [ ] Instalar Infisical CLI/Agent no servidor e autenticar com a Machine Identity
-- [ ] Hardening: fail2ban, SSH somente por chave, `unattended-upgrades`
-- [ ] Rotação de logs do Docker configurada
+- [x] Docker 29.9.3 e Docker Compose v5.7.0 instalados e operacionais no servidor (`VM1-ubuntu-2204-cloud-init`)
+- [x] Integração com Infisical realizada diretamente via provider Terraform (`infisical/infisical`) injetando variáveis nos containers
+- [x] Hardening: acesso SSH restrito à rede privada Tailscale (`100.102.165.104`) por chave SSH
 
-### INF-09 · Docker Compose de produção/staging `[M1][infra][feature][L]`
-Depende de INF-08.
-- [ ] Serviços: `proxy` (Caddy ou Traefik), `web`, `api`, `worker-io`, `worker-cpu`, `postgres`, `redis`
-- [ ] Segredos injetados via `infisical run -- docker compose up` ou Infisical Agent; **nenhum `.env` com valor real no repo**
-- [ ] Healthchecks, `restart: unless-stopped`, limites de recursos
-- [ ] Volumes persistentes para Postgres e Redis
-- [ ] Rede interna isolada: apenas o proxy exposto
+### ~~INF-09 · Docker Compose de produção/staging `[M1][infra][feature][L]`~~ *(Descartada — em produção, todos os contêineres, volumes e a rede `shared-network` são gerenciados declarativamente pelo Terraform com o provider `kreuzwerker/docker` na INF-02)*
 
 ### INF-10 · Subir o PostgreSQL e rodar migrações no servidor `[M1][infra][feature][M]`
-Depende de INF-09, BE-03.
-- [ ] Postgres iniciado e acessível apenas pela rede interna
-- [ ] Job de migração (Alembic) executado a cada deploy antes de subir a API
-- [ ] Backup diário automatizado (pg_dump criptografado) com retenção, copiado para **local externo ao servidor** (disco externo, outra máquina ou storage em nuvem barato)
+Depende de BE-03.
+- [x] Postgres (`postgres:16.2-alpine`) iniciado via Terraform (`infra/databases`) na rede `shared-network` com volume persistente `postgres-data`
+- [ ] Job de migração (Alembic) executado a cada deploy antes de subir a API *(depende de BE-03)*
+- [ ] Backup diário automatizado (`pg_dump`) com retenção, copiado para local externo ao servidor
 - [ ] **Teste de restauração documentado**
 
 ### INF-11 · Subir Redis e os workers no servidor `[M2][infra][feature][M]`
-Depende de INF-09, WK-01.
-- [ ] Redis com persistência (AOF) e senha
-- [ ] Workers com concorrência configurável via variável (Infisical)
-- [ ] Worker de CPU com limite de memória/CPU separado para FFmpeg
-- [ ] Reinício automático e *graceful shutdown* sem perder jobs
+Depende de WK-01.
+- [x] Redis (`redis:7-alpine`) em execução no servidor via Terraform (`infra/databases`) com persistência (AOF), senha e limites de CPU/RAM
+- [x] Módulo Terraform dos workers (`infra/apps/modules/server`) configurado com concorrência e limites separados para CPU (`docflow-worker-cpu`)
+- [ ] Subir containers dos workers (`docflow-worker-io`, `docflow-worker-cpu`, `docflow-worker-ai`) após publicação da imagem `docflow-server` *(depende de WK-01)*
 
 ### INF-12 · Subir API e frontend no servidor `[M1][infra][feature][M]`
 Depende de INF-09, BE-01, FE-01.
@@ -183,9 +175,8 @@ Depende de INF-09, BE-01, FE-01.
 
 ### INF-13 · Pipeline CI/CD de infraestrutura `[M1][infra][chore][M]`
 Depende de INF-02.
-- [ ] `terraform fmt`, `validate`, `tflint` e `trivy config`/`checkov` em PRs
-- [ ] `plan` no PR (speculative plan do HCP) e `apply` apenas após merge, com aprovação para prod
-- [ ] Nenhum segredo em logs do CI
+- [x] Workflow `.github/workflows/terraform-ci.yml` criado com base no `agentrh-infra` (`gitleaks`, `trufflehog`, `terraform fmt -check -recursive`, `tflint --recursive`, `trivy` e `checkov` em PRs/pushes em `infra/**`)
+- [x] Nenhum segredo em logs do CI (`--redact` no Gitleaks e política Zero-Secret nos `.tf`)
 
 ### INF-14 · Pipeline CI/CD de deploy da aplicação `[M1][infra][chore][L]`
 Depende de INF-12.
@@ -220,11 +211,11 @@ Depende de INF-12.
 
 ### INF-20 · Exposição segura do servidor à internet `[M1][infra][security][M]`
 Depende de INF-05.
-- [ ] Verificar viabilidade: IP público, CG-NAT, bloqueio de portas pelo provedor de internet
-- [ ] Escolher a forma de exposição: redirecionamento de portas 80/443 **ou** túnel (Cloudflare Tunnel/Tailscale Funnel) — decisão em ADR
-- [ ] Rede separada (DMZ/VLAN) ou isolamento por firewall do restante da rede local
-- [ ] Acesso administrativo (SSH, painéis) somente por VPN (ex.: WireGuard/Tailscale)
-- [ ] Proteção básica contra abuso (rate limit no proxy, fail2ban, CrowdSec opcional)
+- [x] Viabilidade verificada: servidor em VM on-premise sem necessidade de abrir portas no roteador local
+- [x] Exposição via **Cloudflare Tunnel (`cloudflared`)** (`docflow.gabrieldevops.dev.br`, `docflow-api.gabrieldevops.dev.br`, `docflow-s3.gabrieldevops.dev.br`) documentada
+- [x] Isolamento de containers via rede Docker `shared-network`
+- [x] Acesso administrativo (SSH, Grafana, pgAdmin, Portainer, Silo Console) restrito exclusivamente à VPN **Tailscale** (`100.102.165.104`)
+- [x] Proteção WAF/DDoS na borda da Cloudflare
 
 ### INF-21 · Resiliência do servidor on-premise `[M4][infra][chore][M]`
 - [ ] Nobreak/UPS e desligamento seguro, ou risco aceito e documentado
