@@ -25,221 +25,47 @@ Este documento define o modelo de domínio do **DocFlow**, incluindo o glossári
 
 ---
 
-## 2. Diagrama Entidade-Relacionamento (ER)
+## 2. Visão Geral dos Relacionamentos e Diagrama ER
+
+Abaixo está o **mapa macro** de como as 13 entidades se conectam. Para visualizar todas as colunas, tipos e chaves de cada tabela em diagramas menores (divididos por contexto), acesse:
+
+👉 **[Diagramas Entidade-Relacionamento Detalhados (`docs/diagrama-er.md`)](./diagrama-er.md)**
 
 ```mermaid
-erDiagram
-  INSTITUTION ||--o{ USER : "possui"
-  INSTITUTION ||--o{ MEDIA : "armazena"
-  INSTITUTION ||--o{ TEMPLATE : "personaliza"
-  INSTITUTION ||--o{ DOCUMENT : "produz"
-  INSTITUTION ||--o{ JOB : "executa"
-  INSTITUTION ||--o{ AUDIT_LOG : "registra"
-  INSTITUTION ||--o{ USAGE : "contabiliza"
+flowchart TB
+  subgraph Tenant["1. Identidade, Governança e Consumo"]
+    INST["Institution (Tenant)"]
+    USR["User (Admin / Funcionário)"]
+    AUD["AuditLog (Append-only)"]
+    USG["Usage (Cotas mensais)"]
+  end
 
-  USER ||--o{ MEDIA : "envia (uploaded_by)"
-  USER ||--o{ DOCUMENT : "solicita e valida (author_id)"
-  USER ||--o{ AUDIT_LOG : "realiza acao"
+  subgraph MediaTrans["2. Mídia, Jobs e Transcrição"]
+    MED["Media (Vídeo/Áudio até 10 GB / 2h30)"]
+    JOB["Job (Filas Celery: io, cpu, ai)"]
+    TRN["Transcript (pt-BR)"]
+    SPK["Speaker (Falante 1, 2...)"]
+    SEG["TranscriptSegment (Trecho + Timestamp)"]
+  end
 
-  MEDIA ||--o{ MEDIA : "origina comprimida (source_media_id)"
-  MEDIA ||--o| TRANSCRIPT : "gera"
-  MEDIA ||--o{ JOB : "processada por"
+  subgraph Docs["3. Modelos e Documentos"]
+    TPL["Template"]
+    TPV["TemplateVersion (Imutável)"]
+    DOC["Document (Rascunho -> Validação -> Aprovado)"]
+    DCV["DocumentVersion (Campos + Evidências + DOCX/PDF)"]
+  end
 
-  TRANSCRIPT ||--o{ SPEAKER : "identifica"
-  TRANSCRIPT ||--o{ TRANSCRIPT_SEGMENT : "contem"
-  SPEAKER ||--o{ TRANSCRIPT_SEGMENT : "fala em"
-
-  TEMPLATE ||--o{ TEMPLATE_VERSION : "possui versoes"
-  TEMPLATE_VERSION ||--o{ DOCUMENT : "estrutura"
-
-  DOCUMENT ||--o{ DOCUMENT_VERSION : "historico de versoes"
-  DOCUMENT }o--o{ TRANSCRIPT : "baseado em (document_transcripts)"
-
-  INSTITUTION {
-    uuid id PK
-    string name
-    string institution_type "SCHOOL | PUBLIC_AGENCY | NGO | OTHER"
-    string cnpj UK
-    string email
-    string phone
-    string address
-    boolean ai_cloud_enabled "RN-15 consentimento IA nuvem"
-    int retention_days "RN-14 prazo retencao midias"
-    int quota_transcription_minutes "RN-16 limite mensal"
-    bigint quota_storage_bytes "RN-16 limite storage"
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  USER {
-    uuid id PK
-    uuid institution_id FK "RN-01 multi-tenant"
-    string name
-    string email
-    string password_hash "Argon2id"
-    string role "ADMIN | EMPLOYEE"
-    string status "ACTIVE | INACTIVE"
-    timestamp last_login_at
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  MEDIA {
-    uuid id PK
-    uuid institution_id FK
-    uuid uploaded_by_id FK
-    uuid source_media_id FK "Nullable: aponta p/ original se comprimida (RN-18)"
-    string title
-    string original_filename
-    string content_type
-    bigint size_bytes "Max 10 GiB (RN-05)"
-    int duration_seconds "Max 9000s / 2h30 (RN-05)"
-    string storage_bucket "media-raw | media-processed"
-    string storage_key "Prefixo: <institution_id>/<media_id>/..."
-    string s3_upload_id "Nullable: Multipart Upload ID"
-    string compression_profile "ORIGINAL | LIGHT | HIGH_QUALITY | AUDIO_ONLY"
-    string status "UPLOADING | PROCESSING | READY | FAILED | ABORTED | DELETED"
-    string error_message
-    timestamp expires_at "Calculado pela politica de retencao (RN-14)"
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  JOB {
-    uuid id PK
-    uuid institution_id FK
-    uuid created_by_id FK
-    uuid media_id FK "Nullable"
-    uuid document_id FK "Nullable"
-    string job_type "METADATA | COMPRESSION | TRANSCRIPTION | DOC_GEN | DOC_REVIEW | DOC_EXPORT"
-    string queue_name "io | cpu | ai"
-    string status "QUEUED | PROCESSING | COMPLETED | FAILED | CANCELED"
-    int progress_percent "0 a 100"
-    int attempts
-    string idempotency_key UK
-    jsonb payload
-    jsonb result_summary
-    string error_message
-    timestamp started_at
-    timestamp finished_at
-    timestamp created_at
-  }
-
-  TRANSCRIPT {
-    uuid id PK
-    uuid institution_id FK
-    uuid media_id FK
-    string language "pt-BR (fixo no MVP)"
-    string provider_name "deepgram | assemblyai | google_stt | fake"
-    float overall_confidence "0.0 a 1.0"
-    int version "Incrementado a cada edicao humana"
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  SPEAKER {
-    uuid id PK
-    uuid institution_id FK
-    uuid transcript_id FK
-    string speaker_label "Ex: Falante 1 (RN-17)"
-    string display_name "Nome renomeado pelo usuario (RF-11)"
-    int speaking_Order
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  TRANSCRIPT_SEGMENT {
-    uuid id PK
-    uuid institution_id FK
-    uuid transcript_id FK
-    uuid speaker_id FK
-    int segment_index
-    int start_ms "Timestamp inicial em ms"
-    int end_ms "Timestamp final em ms"
-    text content "Texto do trecho (editavel)"
-    float confidence "0.0 a 1.0 (RF-14)"
-    boolean is_edited
-    timestamp updated_at
-  }
-
-  TEMPLATE {
-    uuid id PK
-    uuid institution_id FK "Nullable se is_system_default = true"
-    string name
-    string category "ATA | OFICIO | MEMORANDO | PRESTACAO_CONTAS"
-    string description
-    boolean is_system_default "RF-16 modelo padrao"
-    boolean is_active
-    int current_version_number
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  TEMPLATE_VERSION {
-    uuid id PK
-    uuid institution_id FK "Nullable se modelo do sistema"
-    uuid template_id FK
-    int version_number "Imutavel apos publicacao (RN-12)"
-    jsonb fields_schema "Lista de campos: key, label, type, required, rules"
-    text body_markdown "Estrutura base ou instrucoes de secao"
-    string docx_storage_key "Caminho do template .docx no Silo"
-    timestamp published_at
-  }
-
-  DOCUMENT {
-    uuid id PK
-    uuid institution_id FK
-    uuid template_version_id FK "Versao exata usada (RN-12)"
-    uuid author_id FK "Solicitante e validador do documento (RN-07)"
-    string title
-    string category "ATA | OFICIO | MEMORANDO | PRESTACAO_CONTAS"
-    string status "DRAFT | IN_VALIDATION | APPROVED | RETURNED"
-    int current_version_number
-    text return_justification "Obrigatorio quando RETURNED (RN-10)"
-    timestamp approved_at
-    timestamp created_at
-    timestamp updated_at
-  }
-
-  DOCUMENT_VERSION {
-    uuid id PK
-    uuid institution_id FK
-    uuid document_id FK
-    uuid created_by_id FK
-    int version_number
-    jsonb extracted_fields "Valores, status (FILLED/PENDING/AMBIGUOUS), confianca e evidencias"
-    text rendered_content "Conteudo rico das secoes do documento"
-    jsonb ai_review_suggestions "Sugestoes de revisao automatica (RF-22)"
-    string docx_storage_key "Arquivo DOCX exportado no Silo"
-    string pdf_storage_key "Arquivo PDF exportado no Silo"
-    string change_summary "Resumo da alteracao para historico/diff"
-    timestamp created_at
-  }
-
-  AUDIT_LOG {
-    uuid id PK
-    uuid institution_id FK
-    uuid user_id FK "Nullable em eventos de sistema/falha de login"
-    string action "LOGIN | MEDIA_UPLOAD | TRANSCRIPT_EDIT | DOC_GENERATE | DOC_APPROVE | DOC_RETURN | DOC_EXPORT | USER_CHANGE | ..."
-    string entity_type "Institution | User | Media | Transcript | Template | Document"
-    uuid entity_id
-    string summary
-    jsonb metadata "Detalhes antes/depois sem dados sensiveis"
-    string ip_address
-    timestamp created_at "Append-only: sem UPDATE ou DELETE (RN-11)"
-  }
-
-  USAGE {
-    uuid id PK
-    uuid institution_id FK
-    string period_month "Formato YYYY-MM (ex: 2026-11)"
-    int transcription_minutes_used
-    bigint storage_bytes_used
-    bigint llm_input_tokens
-    bigint llm_output_tokens
-    int compression_jobs_count "Apenas informativo — ilimitado no MVP (RN-18)"
-    timestamp updated_at
-  }
+  INST --> USR & MED & TPL & DOC & JOB & AUD & USG
+  USR -->|envia| MED
+  USR -->|solicita e valida| DOC
+  MED -->|gera| TRN
+  MED -->|processada por| JOB
+  TRN --> SPK & SEG
+  SPK --> SEG
+  TPL --> TPV
+  TPV -->|estrutura| DOC
+  TRN -.->|embasa evidências| DOC
+  DOC --> DCV
 ```
 
 ---
