@@ -42,10 +42,10 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 ### DOC-05 · Arquitetura de monolito modular com API e workers no mesmo código-base (`apps/server/README.md`) `[M0][docs][S]`
 - [x] Explicação clara documentada diretamente em `apps/server/README.md`
 
-### DOC-06 · ADR-004: Provedores de IA atrás de interfaces (`TranscriptionProvider`, `LLMProvider`) `[M0][docs][spike][M]`
-- [ ] Comparativo de pelo menos 3 provedores de transcrição com diarização em PT-BR (qualidade, preço/hora, limites de arquivo, DPA/LGPD, região dos dados)
-- [ ] Comparativo de LLMs (custo, saída estruturada, retenção de dados)
-- [ ] Decisão do provedor inicial e plano de troca
+### DOC-06 · Provedores de IA atrás de interfaces (`docs/provedores-ia.md`: `TranscriptionProvider`, `LLMProvider`) `[M0][docs][spike][M]`
+- [x] Comparativo de pelo menos 3 provedores de transcrição com diarização em PT-BR (qualidade, preço/hora, limites de arquivo, DPA/LGPD, região dos dados)
+- [x] Comparativo de LLMs (custo, saída estruturada, retenção de dados)
+- [x] Decisão do provedor inicial (Deepgram Nova-3 + Gemini 2.5 Flash) e plano de troca documentados em `docs/provedores-ia.md`
 
 ### DOC-07 · ADR-005: Infraestrutura (Terraform + HCP Terraform + Infisical + Docker Compose) `[M0][docs][S]`
 - [ ] Registrar que a hospedagem é **servidor próprio on-premise** (sem provedor de nuvem para compute/storage) e as consequências: disponibilidade, energia, rede, backup off-site
