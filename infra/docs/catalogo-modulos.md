@@ -10,7 +10,7 @@ Em todo o monorepo do DocFlow, existem **apenas 2 `Dockerfile`s** (um para cada 
 
 | Dockerfile no Monorepo | Imagem Gerada (GHCR) | Submódulo Terraform Correspondente | Contêineres Provisionados pelo Submódulo |
 | :--- | :--- | :--- | :--- |
-| [`apps/web/Dockerfile`](../apps/web/Dockerfile) | `ghcr.io/<org>/docflow-web:<tag>` | `infra/apps/modules/web` | **`docflow-web`**: Frontend React compilado servido via Nginx (porta `80`). |
+| [`apps/web/Dockerfile`](../../apps/web/Dockerfile) | `ghcr.io/<org>/docflow-web:<tag>` | `infra/apps/modules/web` | **`docflow-web`**: Frontend React compilado servido via Nginx (porta `80`). |
 | `apps/server/Dockerfile` | `ghcr.io/<org>/docflow-server:<tag>` | `infra/apps/modules/server` | Usa **1 único `docker_image`** (`docflow-server`) e sobe os contêineres mudando apenas o `command`:<br>1. **`docflow-api`** (`uvicorn app.main:app --host 0.0.0.0 --port 8000`)<br>2. **`docflow-worker-io`** (`celery -A app.worker worker -Q io`)<br>3. **`docflow-worker-cpu`** (`celery -A app.worker worker -Q cpu` — com limites dedicados de CPU/RAM para FFmpeg/LibreOffice)<br>4. **`docflow-worker-ai`** (`celery -A app.worker worker -Q ai` — chamadas Deepgram e Gemini) |
 
 > **Por que isso é ótimo?**

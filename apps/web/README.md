@@ -2,6 +2,9 @@
 
 Frontend web do **DocFlow** construído com **React 19**, **TypeScript 5.7**, **Vite 8** e **Tailwind CSS v4**.
 
+> **Documentação Técnica do Módulo (`apps/web/docs/`):**
+> - [`docs/arquitetura-frontend.md`](./docs/arquitetura-frontend.md) — Organização de módulos por funcionalidade, roteamento, integração OpenAPI e diretrizes de segurança/acessibilidade.
+
 Atualmente contém o protótipo funcional demonstrativo do sistema de gestão de documentos administrativos (Atas, Ofícios e Prestações de contas), que será progressivamente integrado à API em `apps/server`.
 
 ---

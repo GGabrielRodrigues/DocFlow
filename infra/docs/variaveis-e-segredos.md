@@ -1,4 +1,4 @@
-# Variáveis de Ambiente e Gestão de Segredos no Infisical (`infra/`)
+# Variáveis de Ambiente e Gestão de Segredos no Infisical (`infra/docs/variaveis-e-segredos.md`)
 
 Este documento define a organização do **Infisical** nas 4 pastas correspondentes aos domínios de `infra/` (`/databases`, `/apps`, `/tools`, `/observability`), o contrato estrito dos arquivos `variables.tf` e o inventário de variáveis.
 

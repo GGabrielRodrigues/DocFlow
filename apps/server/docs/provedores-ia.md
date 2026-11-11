@@ -1,4 +1,4 @@
-# Provedores de IA e Arquitetura de Interfaces (`docs/provedores-ia.md`)
+# Provedores de IA e Arquitetura de Interfaces (`apps/server/docs/provedores-ia.md`)
 
 Este documento registra a pesquisa comparativa, a escolha dos provedores iniciais de Inteligência Artificial em nuvem para o MVP do **DocFlow** e o desenho das interfaces (`TranscriptionProvider` e `LLMProvider`) que evitam aprisionamento tecnológico (*vendor lock-in*).
 

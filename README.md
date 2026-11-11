@@ -10,16 +10,16 @@ O repositório está organizado como um monorepo contendo aplicações, contrato
 
 ```text
 .
+├── docs/                # Documentação de negócios e visão geral (requisitos, stack, backlog)
 ├── apps/
-│   ├── web/         # Frontend em React 19 + TypeScript + Vite + Tailwind CSS v4
-│   └── server/      # Backend modular em Python 3.12+ (FastAPI) + Workers (Celery)
-├── contracts/       # Contratos compartilhados da API (especificação OpenAPI)
-├── docs/            # Documentação de produto, requisitos, ADRs, arquitetura e backlog
-├── infra/           # Infraestrutura como Código (Terraform, Docker Compose, scripts de bootstrap)
-├── .github/         # Templates de Issues, Pull Requests e workflows de CI/CD
-├── .editorconfig    # Padronização de formatação entre editores
-├── .gitignore       # Regras globais de arquivos ignorados pelo Git
-└── CONTRIBUTING.md  # Guia de contribuição, fluxo de branches, commits e PRs
+│   ├── web/             # Frontend em React 19 + TypeScript + Vite (com README.md + docs/)
+│   └── server/          # Backend modular em Python 3.12+ (FastAPI + Celery, com README.md + docs/)
+├── contracts/           # Contratos compartilhados da API OpenAPI (com README.md + docs/)
+├── infra/               # Infraestrutura como Código — Terraform + Infisical + Docker (com README.md + docs/)
+├── .github/             # Templates de Issues, Pull Requests e workflows de CI/CD
+├── .editorconfig        # Padronização de formatação entre editores
+├── .gitignore           # Regras globais de arquivos ignorados pelo Git
+└── CONTRIBUTING.md      # Guia de contribuição, fluxo de branches, commits e PRs
 ```
 
 ### Descrição dos Módulos

@@ -1,8 +1,8 @@
-# Diagramas Entidade-Relacionamento Detalhados (`docs/diagrama-er.md`)
+# Diagramas Entidade-Relacionamento Detalhados (`apps/server/docs/diagrama-er.md`)
 
 Para facilitar a leitura direta no GitHub sem precisar de *zoom* ou navegação por setas, o Diagrama Entidade-Relacionamento (ER) completo do **DocFlow** está dividido abaixo nos **3 contextos de domínio** do sistema.
 
-> Voltar para: [`docs/modelo-dominio.md`](./modelo-dominio.md)
+> Voltar para: [`apps/server/docs/modelo-dominio.md`](./modelo-dominio.md)
 
 ---
 

@@ -1,4 +1,4 @@
-# Estratégia de Upload de 10 GB via Multipart no Silo/S3 (`docs/upload-multipart.md`)
+# Estratégia de Upload de 10 GB via Multipart no Silo/S3 (`apps/server/docs/upload-multipart.md`)
 
 Este documento define a arquitetura e as regras técnicas para o envio de arquivos de vídeo e áudio de até **10 GB** e duração máxima de **2h30** (`RF-05`, `RF-06`, `RN-05`, `RNF-03`), operando em conjunto com o **Silo (fork do MinIO)** e o **Cloudflare Tunnel**.
 

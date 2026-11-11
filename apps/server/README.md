@@ -2,10 +2,12 @@
 
 Backend do **DocFlow** em **Python 3.12+**, estruturado como um **Monolito Modular** que reúne a **API HTTP (FastAPI)** e os **Workers assíncronos (Celery)** no mesmo código-base.
 
-> **Documentação Complementar em `docs/`:**
-> - [`docs/multi-tenancy.md`](../../docs/multi-tenancy.md) — Estratégia de isolamento multi-tenant (`institution_id` + PostgreSQL RLS + prefixos no Silo/S3).
-> - [`docs/upload-multipart.md`](../../docs/upload-multipart.md) — Estratégia de upload multipart de até 10 GB / 2h30 direto no Silo via Cloudflare Tunnel.
-> - [`docs/provedores-ia.md`](../../docs/provedores-ia.md) — Interfaces `TranscriptionProvider` e `LLMProvider`, comparativo e plano de troca.
+> **Documentação Técnica do Módulo (`apps/server/docs/`):**
+> - [`docs/modelo-dominio.md`](./docs/modelo-dominio.md) — Glossário da linguagem ubíqua, invariantes de domínio e máquinas de estado (`Document`, `Media`, `Job`).
+> - [`docs/diagrama-er.md`](./docs/diagrama-er.md) — Diagramas Entidade-Relacionamento (ER) detalhados por contexto.
+> - [`docs/multi-tenancy.md`](./docs/multi-tenancy.md) — Estratégia de isolamento multi-tenant (`institution_id` + PostgreSQL RLS + prefixos no Silo/S3).
+> - [`docs/upload-multipart.md`](./docs/upload-multipart.md) — Estratégia de upload multipart de até 10 GB / 2h30 direto no Silo via Cloudflare Tunnel.
+> - [`docs/provedores-ia.md`](./docs/provedores-ia.md) — Interfaces `TranscriptionProvider` e `LLMProvider`, comparativo e plano de troca.
 
 ---
 

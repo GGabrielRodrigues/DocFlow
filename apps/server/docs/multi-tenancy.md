@@ -1,4 +1,4 @@
-# Estratégia de Multi-tenancy e Isolamento de Dados (`docs/multi-tenancy.md`)
+# Estratégia de Multi-tenancy e Isolamento de Dados (`apps/server/docs/multi-tenancy.md`)
 
 Este documento descreve como o **DocFlow** garante o isolamento estrito dos dados entre diferentes instituições (regra de negócio `RN-01` e requisito `RNF-06`) no banco de dados PostgreSQL, nos workers do Celery e no Object Storage (Silo/S3).
 

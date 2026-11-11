@@ -42,31 +42,31 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 ### DOC-05 · Arquitetura de monolito modular com API e workers no mesmo código-base (`apps/server/README.md`) `[M0][docs][S]`
 - [x] Explicação clara documentada diretamente em `apps/server/README.md`
 
-### DOC-06 · Provedores de IA atrás de interfaces (`docs/provedores-ia.md`: `TranscriptionProvider`, `LLMProvider`) `[M0][docs][spike][M]`
+### DOC-06 · Provedores de IA atrás de interfaces (`apps/server/docs/provedores-ia.md`: `TranscriptionProvider`, `LLMProvider`) `[M0][docs][spike][M]`
 - [x] Comparativo de pelo menos 3 provedores de transcrição com diarização em PT-BR (qualidade, preço/hora, limites de arquivo, DPA/LGPD, região dos dados)
 - [x] Comparativo de LLMs (custo, saída estruturada, retenção de dados)
-- [x] Decisão do provedor inicial (Deepgram Nova-3 + Gemini 2.5 Flash) e plano de troca documentados em `docs/provedores-ia.md`
+- [x] Decisão do provedor inicial (Deepgram Nova-3 + Gemini 2.5 Flash) e plano de troca documentados em `apps/server/docs/provedores-ia.md`
 
 ### DOC-07 · Documentação da Infraestrutura (`infra/`: Terraform + HCP Terraform Cloud + Infisical + Docker Socket + Cloudflare Tunnel) `[M0][docs][S]`
-- [x] Registrar que a hospedagem é **servidor próprio on-premise** e a exposição externa (DNS + TLS) é provida pelo **Cloudflare Tunnel (`cloudflared`)** (`infra/README.md` e `infra/catalogo-modulos.md`)
+- [x] Registrar que a hospedagem é **servidor próprio on-premise** e a exposição externa (DNS + TLS) é provida pelo **Cloudflare Tunnel (`cloudflared`)** (`infra/README.md` e `infra/docs/catalogo-modulos.md`)
 - [x] Explicar a estrutura em 3 camadas nos 4 domínios (`databases`, `apps`, `tools`, `observability`), o mapeamento dos 2 `Dockerfile`s (`web` e `server`), o uso do **HCP Terraform Cloud (tier gratuito)** e a conexão híbrida via socket do Docker (`unix:///var/run/docker.sock`) ou SSH (`docker_ssh_host`)
-- [x] Descrever o fluxo de estado remoto e o inventário completo de variáveis/segredos no Infisical (`infra/variaveis-e-segredos.md` e `infra/AGENTS.md`)
+- [x] Descrever o fluxo de estado remoto e o inventário completo de variáveis/segredos no Infisical (`infra/docs/variaveis-e-segredos.md` e `infra/AGENTS.md`)
 - [x] Listar providers Terraform usados: `kreuzwerker/docker` (`~> 3.0.1`) e `infisical/infisical` (`~> 0.16.0`)
 
-### DOC-08 · Estratégia de Multi-tenancy (`docs/multi-tenancy.md`: coluna `institution_id` + RLS) `[M0][docs][S]`
-- [x] Decisão documentada em `docs/multi-tenancy.md`: tabela compartilhada com coluna `institution_id` obrigatória + Row-Level Security (RLS) do PostgreSQL como defesa em profundidade e isolamento por prefixo no Silo (S3)
+### DOC-08 · Estratégia de Multi-tenancy (`apps/server/docs/multi-tenancy.md`: coluna `institution_id` + RLS) `[M0][docs][S]`
+- [x] Decisão documentada em `apps/server/docs/multi-tenancy.md`: tabela compartilhada com coluna `institution_id` obrigatória + Row-Level Security (RLS) do PostgreSQL como defesa em profundidade e isolamento por prefixo no Silo (S3)
 
-### DOC-09 · Estratégia de upload de 10 GB (`docs/upload-multipart.md`: multipart direto no Silo/S3) `[M0][docs][S]`
-- [x] Estratégia documentada em `docs/upload-multipart.md`: partes de 50 MB (compatível com o limite de 100 MB do Cloudflare Tunnel), 3 envios paralelos, validação dupla de 10 GB / 2h30, CORS com exposição de `ETag` e limpeza de uploads abandonados em 24h
+### DOC-09 · Estratégia de upload de 10 GB (`apps/server/docs/upload-multipart.md`: multipart direto no Silo/S3) `[M0][docs][S]`
+- [x] Estratégia documentada em `apps/server/docs/upload-multipart.md`: partes de 50 MB (compatível com o limite de 100 MB do Cloudflare Tunnel), 3 envios paralelos, validação dupla de 10 GB / 2h30, CORS com exposição de `ETag` e limpeza de uploads abandonados em 24h
 
-### DOC-10 · Modelo de domínio e diagrama ER (`docs/modelo-dominio.md`) `[M0][docs][M]`
+### DOC-10 · Modelo de domínio e diagrama ER (`apps/server/docs/modelo-dominio.md` e `apps/server/docs/diagrama-er.md`) `[M0][docs][M]`
 Entidades: Institution, User, Media, Transcript, Speaker, TranscriptSegment, Template, TemplateVersion, Document, DocumentVersion, AuditLog, Job, Usage.
-- [x] Diagrama ER (Mermaid) e glossário (linguagem ubíqua) em `docs/modelo-dominio.md`
-- [x] Máquina de estados de Document, Media e Job em `docs/modelo-dominio.md`
+- [x] Diagrama ER (Mermaid) e glossário (linguagem ubíqua) em `apps/server/docs/modelo-dominio.md` e `apps/server/docs/diagrama-er.md`
+- [x] Máquina de estados de Document, Media e Job em `apps/server/docs/modelo-dominio.md`
 
-### DOC-11 · Contrato inicial da API (`contracts/README.md` — OpenAPI) `[M0][docs][M]`
+### DOC-11 · Contrato inicial da API (`contracts/docs/contrato-api.md` — OpenAPI) `[M0][docs][M]`
 Depende de DOC-10.
-- [x] Esboço completo de endpoints por contexto (`/api/v1/...`), convenções de erro (RFC 9457), paginação e autenticação documentados em `contracts/README.md`
+- [x] Esboço completo de endpoints por contexto (`/api/v1/...`), convenções de erro (RFC 9457), paginação e autenticação documentados em `contracts/docs/contrato-api.md`
 
 ### DOC-12 · Política de privacidade e LGPD do produto `[M4][docs][M]`
 - [ ] Mapeamento de dados pessoais tratados (vídeo, voz, nomes, transcrições)

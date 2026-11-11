@@ -1,4 +1,4 @@
-# Modelo de Domínio, Glossário e Diagrama ER (`docs/modelo-dominio.md`)
+# Modelo de Domínio, Glossário e Diagrama ER (`apps/server/docs/modelo-dominio.md`)
 
 Este documento define o modelo de domínio do **DocFlow**, incluindo o glossário da linguagem ubíqua, o Diagrama Entidade-Relacionamento (ER) das **13 entidades centrais**, os contratos de campos estruturados e as máquinas de estado de **`Document`**, **`Media`** e **`Job`**.
 

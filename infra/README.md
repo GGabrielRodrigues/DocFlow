@@ -2,10 +2,10 @@
 
 Diretório de **Infraestrutura como Código (IaC)** do **DocFlow**. Gerencia de forma declarativa, modular e automatizada os bancos de dados, aplicações próprias, ferramentas operacionais e observabilidade no servidor **on-premise**, com exposição externa via **Cloudflare Tunnel**.
 
-> **Documentação Complementar em `infra/`:**
-> - [`infra/catalogo-modulos.md`](./catalogo-modulos.md) — Catálogo dos 4 domínios (`databases`, `apps`, `tools`, `observability`), mapeamento dos 2 `Dockerfile`s para os submódulos de `apps`, rede `shared-network` e **Cloudflare Tunnel** (DNS + TLS).
-> - [`infra/variaveis-e-segredos.md`](./variaveis-e-segredos.md) — Estrutura de pastas no **Infisical** (`/databases`, `/apps`, `/tools`, `/observability`), inventário de variáveis e contratos de `variables.tf`.
-> - [`infra/AGENTS.md`](./AGENTS.md) — Guia de regras estritas e passo a passo para criação/manutenção de módulos Terraform.
+> **Documentação Técnica do Módulo (`infra/docs/`):**
+> - [`docs/catalogo-modulos.md`](./docs/catalogo-modulos.md) — Catálogo dos 4 domínios (`databases`, `apps`, `tools`, `observability`), mapeamento dos 2 `Dockerfile`s para os submódulos de `apps`, rede `shared-network` e **Cloudflare Tunnel** (DNS + TLS).
+> - [`docs/variaveis-e-segredos.md`](./docs/variaveis-e-segredos.md) — Estrutura de pastas no **Infisical** (`/databases`, `/apps`, `/tools`, `/observability`), inventário de variáveis e contratos de `variables.tf`.
+> - [`AGENTS.md`](./AGENTS.md) — Guia de regras estritas e passo a passo para criação/manutenção de módulos Terraform.
 
 ---
 
@@ -144,8 +144,9 @@ infra/
 ├── Makefile                        # Automação de qualidade e segurança (make check)
 ├── README.md                       # Este documento
 ├── AGENTS.md                       # Diretrizes para agentes de IA e contribuidores
-├── catalogo-modulos.md             # Detalhamento dos 4 domínios, 2 Dockerfiles e Cloudflare Tunnel
-└── variaveis-e-segredos.md         # Inventário de pastas (/databases, /apps, /tools, /observability) no Infisical
+└── docs/                           # Documentação técnica da infraestrutura
+    ├── catalogo-modulos.md         # Detalhamento dos 4 domínios, 2 Dockerfiles e Cloudflare Tunnel
+    └── variaveis-e-segredos.md     # Inventário de pastas (/databases, /apps, /tools, /observability) no Infisical
 ```
 
 ### Papel de Cada Camada
