@@ -62,6 +62,11 @@ poetry run docflow-api
 Com `DOCFLOW_DEBUG=true`, a documentação interativa fica disponível em
 `http://127.0.0.1:8000/docs`.
 
+- Banco e migrações:
+  - `poetry run alembic upgrade head`: aplica as migrações.
+  - `poetry run alembic downgrade -1`: reverte a última migração.
+  - `poetry run alembic revision --autogenerate -m "descricao"`: cria uma migração após alterar os modelos.
+
 - `src/docflow/main.py`: criação da aplicação e entrypoint do Uvicorn.
 - `src/docflow/api/router.py`: composição dos routers HTTP da aplicação.
 - `src/docflow/api/routers/`: routers HTTP e seus schemas de entrada/saída.

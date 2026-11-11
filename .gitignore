@@ -99,6 +99,7 @@ playwright/.cache/
 .DS_Store
 Thumbs.db
 *.log
+apps/server/*.db
 tmp/
 temp/
 /teste
