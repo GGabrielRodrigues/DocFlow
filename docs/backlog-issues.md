@@ -39,7 +39,8 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 ### DOC-04 · Documentação da Stack (`docs/stack.md`: Python/FastAPI, React/TS, PostgreSQL, Redis, S3) `[M0][docs][S]`
 - [x] Documento `docs/stack.md` de fácil entendimento detalhando a stack, responsabilidades e integração entre componentes
 
-### DOC-05 · ADR-003: Monolito modular com API e workers no mesmo código-base `[M0][docs][S]`
+### DOC-05 · Arquitetura de monolito modular com API e workers no mesmo código-base (`apps/server/README.md`) `[M0][docs][S]`
+- [x] Explicação clara documentada diretamente em `apps/server/README.md`
 
 ### DOC-06 · ADR-004: Provedores de IA atrás de interfaces (`TranscriptionProvider`, `LLMProvider`) `[M0][docs][spike][M]`
 - [ ] Comparativo de pelo menos 3 provedores de transcrição com diarização em PT-BR (qualidade, preço/hora, limites de arquivo, DPA/LGPD, região dos dados)
