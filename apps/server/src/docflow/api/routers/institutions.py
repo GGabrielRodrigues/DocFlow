@@ -4,10 +4,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy.orm import Session, sessionmaker
 
 from docflow.application.identity import RegisterInstitution
 from docflow.domain.identity import DomainValidationError, RegistrationConflictError
-from docflow.infra.identity import InMemoryRegistrationRepository
+from docflow.infra.identity import SqlAlchemyRegistrationRepository
 
 
 class InstitutionRegistrationData(BaseModel):
@@ -58,9 +59,7 @@ class RegistrationResponse(BaseModel):
     administrator: AdministratorResponse
 
 
-def create_institutions_router() -> APIRouter:
-    repository = InMemoryRegistrationRepository()
-    register = RegisterInstitution(repository)
+def create_institutions_router(session_factory: sessionmaker[Session]) -> APIRouter:
     router = APIRouter(prefix="/api/v1/institutions", tags=["identity"])
 
     @router.post(
@@ -70,8 +69,14 @@ def create_institutions_router() -> APIRouter:
         summary="Cadastra uma instituição e seu primeiro administrador",
     )
     async def register_institution(payload: RegistrationRequest) -> RegistrationResponse:
+        with session_factory() as session:
+            repository = SqlAlchemyRegistrationRepository(session)
+            register = RegisterInstitution(repository)
+            return _register(payload, register)
+
+    def _register(payload: RegistrationRequest, use_case: RegisterInstitution) -> RegistrationResponse:
         try:
-            registration = register.execute(
+            registration = use_case.execute(
                 institution_name=payload.institution.name,
                 institution_type=payload.institution.institution_type,
                 cnpj=payload.institution.cnpj,

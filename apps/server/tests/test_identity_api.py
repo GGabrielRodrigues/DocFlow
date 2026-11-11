@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 
+from docflow.core.config import Settings
 from docflow.main import create_app
 
 
@@ -21,8 +22,12 @@ def _payload() -> dict[str, object]:
     }
 
 
+def _client() -> TestClient:
+    return TestClient(create_app(Settings(database_url="sqlite:///:memory:")))
+
+
 def test_registers_institution_and_first_administrator() -> None:
-    response = TestClient(create_app()).post(
+    response = _client().post(
         "/api/v1/institutions/register",
         json=_payload(),
     )
@@ -39,7 +44,7 @@ def test_registration_rejects_invalid_cnpj() -> None:
     payload = _payload()
     payload["institution"]["cnpj"] = "11.222.333/0001-82"  # type: ignore[index]
 
-    response = TestClient(create_app()).post(
+    response = _client().post(
         "/api/v1/institutions/register",
         json=payload,
     )
@@ -49,7 +54,7 @@ def test_registration_rejects_invalid_cnpj() -> None:
 
 
 def test_registration_rejects_duplicate_cnpj() -> None:
-    client = TestClient(create_app())
+    client = _client()
 
     assert client.post("/api/v1/institutions/register", json=_payload()).status_code == 201
     response = client.post("/api/v1/institutions/register", json=_payload())
