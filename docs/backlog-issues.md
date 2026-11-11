@@ -202,9 +202,9 @@ Depende de INF-12.
 - [ ] Monitoramento externo de uptime
 
 ### INF-16 · Ambiente de desenvolvimento local `[M0][infra][chore][M]`
-- [ ] `docker-compose.dev.yml` com Postgres, Redis, Silo (S3) e Mailpit
-- [ ] Segredos de dev via Infisical (`infisical run`), com `.env.example` apenas com nomes
-- [ ] `make up`/`make test` (ou `just`) documentados
+- [x] `docker-compose.dev.yml` com Postgres, Redis, Silo (`pgsty/silo` + setup de buckets com `pgsty/mc`) e Mailpit
+- [x] Segredos e variáveis de dev via `.env` local criado a partir do `.env.example` (sem segredos reais de produção)
+- [x] `make up`, `make down`, `make logs` e `make test` documentados no `Makefile` e no `README.md`
 
 ### INF-17 · Segurança e hardening em produção `[M4][infra][security][M]`
 - [ ] Revisão de portas, usuários e permissões

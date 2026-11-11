@@ -17,6 +17,9 @@ O repositório está organizado como um monorepo contendo aplicações, contrato
 ├── contracts/           # Contratos compartilhados da API OpenAPI (com README.md + docs/)
 ├── infra/               # Infraestrutura como Código — Terraform + Infisical + Docker (com README.md + docs/)
 ├── .github/             # Templates de Issues, Pull Requests e workflows de CI/CD
+├── docker-compose.dev.yml # Serviços locais de desenvolvimento (Postgres, Redis, Silo S3 e Mailpit)
+├── .env.example         # Template de variáveis de ambiente para desenvolvimento local
+├── Makefile             # Atalhos de automação local (make up, make down, make test, etc.)
 ├── .editorconfig        # Padronização de formatação entre editores
 ├── .gitignore           # Regras globais de arquivos ignorados pelo Git
 └── CONTRIBUTING.md      # Guia de contribuição, fluxo de branches, commits e PRs
@@ -43,7 +46,33 @@ O repositório está organizado como um monorepo contendo aplicações, contrato
 - **Python** 3.12+ e **uv** *(para o módulo `apps/server`)*
 - **Docker** e **Docker Compose** *(opcional para execução em contêiner e serviços de apoio)*
 
-### 1. Executando o Frontend (`apps/web`)
+### 1. Subindo os Serviços de Apoio Local (`docker-compose.dev.yml`)
+
+Para subir localmente o **PostgreSQL 16**, **Redis 7**, **Silo (`pgsty/silo` S3-compatível já com os buckets `media-raw`, `media-processed` e `documents` criados)** e **Mailpit** (captura de e-mails de desenvolvimento):
+
+```bash
+# Cria automaticamente o .env a partir do .env.example e sobe os containers:
+make up
+```
+
+Endereços locais dos serviços de apoio:
+- **PostgreSQL**: `localhost:5432` (banco `docflow_dev`, usuário `docflow`)
+- **Redis**: `localhost:6379`
+- **Silo (API S3)**: `http://localhost:9000`
+- **Silo (Web Console)**: `http://localhost:9001` (`silo_admin` / `silo_admin_dev_secret`)
+- **Mailpit (Web UI de E-mails)**: `http://localhost:8025` (SMTP na porta `1025`)
+
+Outros comandos úteis do [`Makefile`](./Makefile):
+```bash
+make ps           # Status dos containers locais
+make logs         # Logs em tempo real dos containers locais
+make down         # Para os containers mantendo os dados nos volumes
+make clean        # Para os containers e apaga os volumes locais (-v)
+make test         # Executa build/testes dos módulos
+make infra-check  # Roda a validação DevSecOps do Terraform em infra/
+```
+
+### 2. Executando o Frontend (`apps/web`)
 
 1. Acesse o diretório da aplicação web e instale as dependências:
    ```bash
