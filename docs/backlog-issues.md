@@ -12,7 +12,7 @@
 - **M3 – Documentos:** modelos, geração por IA, validação, exportação
 - **M4 – Complementos e produção:** compressão, retenção/LGPD, observabilidade, hardening
 
-**Premissas adotadas:** SaaS multi-instituição; backend e workers em Python (FastAPI + Celery); front React/TS; transcrição e LLM em nuvem atrás de interfaces; Terraform com estado no HCP Terraform; segredos no Infisical; deploy em **servidor próprio (on-premise)** com Docker Compose; storage S3 compatível self-hosted (MinIO).
+**Premissas adotadas:** SaaS multi-instituição; backend e workers em Python (FastAPI + Celery); front React/TS; transcrição e LLM em nuvem atrás de interfaces; Terraform com estado no HCP Terraform; segredos no Infisical; deploy em **servidor próprio (on-premise)** com Docker Compose; storage S3 compatível self-hosted (Silo, fork do MinIO).
 
 > [!NOTE]
 > Sugestão de divisão para 3 pessoas: **A** = backend + workers, **B** = frontend + documentação, **C** = infra + CI + apoio no backend. Cada issue tem `Depende de` para ajudar a ordenar.
@@ -34,10 +34,10 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 - [x] Pontos em aberto transformados em ADRs ou issues (e decisões consolidadas nos requisitos)
 - [x] Matriz de rastreabilidade inicial (requisito → issue)
 
-### DOC-03 · ADR-001: Monorepo e organização de módulos `[M0][docs][S]`
-Registrar decisão, alternativas e consequências. Incluir a renomeação de "Negócios" para `docs/` e "Agentes" para `workers`.
+### ~~DOC-03 · ADR-001: Monorepo e organização de módulos `[M0][docs][S]`~~ *(Descartada — já coberta pelo README raiz e estrutura da DOC-01)*
 
-### DOC-04 · ADR-002: Stack (Python/FastAPI, React/TS, PostgreSQL, Redis, S3) `[M0][docs][S]`
+### DOC-04 · Documentação da Stack (`docs/stack.md`: Python/FastAPI, React/TS, PostgreSQL, Redis, S3) `[M0][docs][S]`
+- [x] Documento `docs/stack.md` de fácil entendimento detalhando a stack, responsabilidades e integração entre componentes
 
 ### DOC-05 · ADR-003: Monolito modular com API e workers no mesmo código-base `[M0][docs][S]`
 
@@ -125,15 +125,15 @@ Depende de INF-02, DOC-07.
 - [ ] IP fixo interno e nome na rede
 - [ ] Terraform gerenciando o que for possível via SSH (provider Docker, arquivos de configuração); o que não for fica documentado como passo manual de bootstrap
 
-### INF-06 · Subir object storage self-hosted (MinIO) e provisionar buckets `[M0][infra][feature][M]`
+### INF-06 · Subir object storage self-hosted (Silo — fork do MinIO) e provisionar buckets `[M0][infra][feature][M]`
 Depende de INF-02, INF-05.
-- [ ] MinIO no servidor (container ou serviço) com disco dedicado e credenciais root no Infisical
-- [ ] Buckets, políticas e usuários criados via Terraform (provider `aminueza/minio`)
+- [ ] Silo no servidor (container ou serviço) com disco dedicado e credenciais root no Infisical
+- [ ] Buckets, políticas e usuários criados via Terraform (provider compatível S3/`aminueza/minio`)
 - [ ] Buckets separados: `media-raw`, `media-processed`, `documents`
 - [ ] Acesso privado, criptografia em repouso, versionamento nos documentos
 - [ ] **CORS** configurado para upload multipart do navegador (expor header `ETag`)
 - [ ] Regras de ciclo de vida (limpeza de multipart incompleto, expiração por retenção)
-- [ ] Endpoint do MinIO acessível pelo **navegador do usuário** via HTTPS (ex.: `s3.<domínio>`), necessário para o upload multipart direto
+- [ ] Endpoint do Silo acessível pelo **navegador do usuário** via HTTPS (ex.: `s3.<domínio>`), necessário para o upload multipart direto
 - [ ] Capacidade de disco dimensionada para vídeos de até 10 GB por upload e alerta de uso
 - [ ] Credenciais de aplicação com permissão mínima, gravadas no Infisical
 
@@ -200,7 +200,7 @@ Depende de INF-12.
 - [ ] Monitoramento externo de uptime
 
 ### INF-16 · Ambiente de desenvolvimento local `[M0][infra][chore][M]`
-- [ ] `docker-compose.dev.yml` com Postgres, Redis, MinIO e Mailpit
+- [ ] `docker-compose.dev.yml` com Postgres, Redis, Silo (S3) e Mailpit
 - [ ] Segredos de dev via Infisical (`infisical run`), com `.env.example` apenas com nomes
 - [ ] `make up`/`make test` (ou `just`) documentados
 
@@ -291,7 +291,7 @@ Cobre RF-05, RF-06, RN-05, RNF-03. Depende de INF-06, DOC-09.
 - [ ] Validação de tamanho (≤ 10 GB) e tipo **antes** de iniciar
 - [ ] Limpeza de uploads abandonados
 - [ ] Após completar: verificar objeto, extrair metadados (duração, codec) via worker e criar `Media`
-- [ ] Testes com MinIO (Testcontainers)
+- [ ] Testes com Silo/S3 (Testcontainers)
 
 ### BE-09 · Mídia: listagem, detalhe, download e exclusão `[M1][backend][feature][M]`
 Cobre RF-07, RN-13, RN-14.

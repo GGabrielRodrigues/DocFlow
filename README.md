@@ -29,7 +29,7 @@ O repositório está organizado como um monorepo contendo aplicações, contrato
 | [`apps/web`](./apps/web) | Interface web para usuários e administradores (gestão de mídias, editor de transcrições, geração/validação de documentos e auditoria). Contém o protótipo funcional demonstrativo. | React 19, TypeScript 5.7, Vite 8, Tailwind CSS v4 |
 | [`apps/server`](./apps/server) | Monolito modular com API HTTP e processamento assíncrono em background (extração de áudio/vídeo com FFmpeg, transcrição com diarização e geração/revisão documental por LLM). | Python 3.12+, FastAPI, Celery, SQLAlchemy 2, PostgreSQL, Redis |
 | [`contracts`](./contracts) | Especificações OpenAPI (`openapi.json`) exportadas pelo backend e utilizadas para geração de clientes tipados no frontend. | OpenAPI 3.1 |
-| [`infra`](./infra) | Provisionamento e operação do servidor on-premise, object storage S3-compatível (MinIO), banco de dados, proxy reverso e gestão de segredos. | Terraform (HCP Terraform), Infisical, Docker Compose, MinIO |
+| [`infra`](./infra) | Provisionamento e operação do servidor on-premise, object storage S3-compatível (Silo, fork do MinIO), banco de dados, proxy reverso e gestão de segredos. | Terraform (HCP Terraform), Infisical, Docker Compose, Silo |
 | [`docs`](./docs) | Requisitos funcionais/não-funcionais, Architecture Decision Records (ADRs), modelagem de domínio, diretrizes de LGPD e [backlog de issues](./docs/backlog-issues.md). | Markdown, Mermaid |
 
 ---

@@ -6,7 +6,7 @@ Monolito modular em **Python 3.12+** responsável pela **API HTTP (FastAPI)** e 
 
 O código-fonte em `apps/server` organiza-se por módulos de domínio:
 - `identity`: instituições (multi-tenant), usuários, autenticação e RBAC
-- `media`: upload multipart no S3/MinIO, metadados e compressão de mídia
+- `media`: upload multipart no S3/Silo, metadados e compressão de mídia
 - `transcription`: pipeline de transcrição com diarização de falantes (`TranscriptionProvider`)
 - `templates`: catálogo e versionamento de modelos de documentos
 - `documents`: geração assistida por IA (`LLMProvider`), revisão, fluxo de validação e exportação (DOCX/PDF)
