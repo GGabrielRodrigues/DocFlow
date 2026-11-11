@@ -34,6 +34,6 @@ module "redis" {
   redis_memory_limit = var.redis_memory_limit
   redis_cpu_limit    = var.redis_cpu_limit
   redis_port         = var.redis_port
-  container_name     = "shared-redis"
+  container_name     = "redis"
   redis_network      = docker_network.shared.name
 }

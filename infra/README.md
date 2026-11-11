@@ -41,7 +41,7 @@ flowchart TD
   INF["Infisical Platform\nUniversal Auth (Machine Identity)\nPastas: /databases, /apps, /tools, /observability"]
   SOCK["Docker Engine no Servidor On-Premise\nkreuzwerker/docker (~> 3.0.1)\nSocket local: unix:///var/run/docker.sock\nou SSH remoto: docker_ssh_host"]
   CF["Cloudflare Edge (DNS + TLS/HTTPS)\nCloudflare Tunnel"]
-  NET["Rede Docker Interna: shared-network\n(postgres, shared-redis, silo,\ndocflow-web, docflow-api, docflow-workers,\npgadmin, portainer, grafana, loki, alloy)"]
+  NET["Rede Docker Interna: shared-network\n(postgres, redis, silo,\ndocflow-web, docflow-api, docflow-workers,\npgadmin, portainer, grafana, loki, alloy)"]
 
   HCP <-->|Remote State & Locking| TF
   TF -->|Lê segredos via data.infisical_secrets| INF

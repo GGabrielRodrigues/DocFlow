@@ -25,7 +25,7 @@ Cada um dos 4 domínios possui seu próprio workspace no **HCP Terraform Cloud**
 | Domínio | Submódulo (`modules/<servico>`) | Descrição Técnica | Rede Docker | Hostname Interno (DNS Docker) |
 | :--- | :--- | :--- | :--- | :--- |
 | **`databases`** | `postgres` | Banco relacional principal (PostgreSQL 16.2 Alpine) com logs de conexão e *slow queries* habilitados. | `shared-network` | `postgres:5432` |
-| **`databases`** | `redis` | Broker do Celery, cache e controle de *rate limit* com quotas de CPU/RAM e persistência. | `shared-network` | `shared-redis:6379` |
+| **`databases`** | `redis` | Broker do Celery, cache e controle de *rate limit* com quotas de CPU/RAM e persistência. | `shared-network` | `redis:6379` |
 | **`databases`** | `silo` | Object Storage S3-compatível on-premise (Silo, fork do MinIO) + container de setup de buckets (`media-raw`, `media-processed`, `documents`, `observability`) e usuários. | `shared-network` | `silo:9000` (API S3)<br>`silo:9001` (Console) |
 | **`apps`** | `web` | Frontend SPA em React + Nginx (`apps/web/Dockerfile`). | `shared-network` | `docflow-web:80` |
 | **`apps`** | `server` | Monolito modular Python (`apps/server/Dockerfile`): sobe o container `docflow-api` (FastAPI) e os containers `docflow-worker-io`, `docflow-worker-cpu` e `docflow-worker-ai` (Celery). | `shared-network` | `docflow-api:8000`<br>`docflow-worker-io`<br>`docflow-worker-cpu`<br>`docflow-worker-ai` |

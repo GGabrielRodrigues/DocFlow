@@ -33,7 +33,7 @@ O servidor opera em uma máquina virtual dedicada (**QEMU/KVM**) sob infraestrut
 | Canal | Configuração | Finalidade |
 | :--- | :--- | :--- |
 | **Rede VPN / Overlay (Tailscale)** | `100.102.165.104` | Acesso administrativo privado via SSH (`ssh://<usuario>@100.102.165.104:22`) utilizado pelo Terraform (`kreuzwerker/docker`) e operadores. |
-| **Rede Interna Docker** | `shared-network` (`bridge`) | Comunicação isolada entre os contêineres (`postgres`, `shared-redis`, `silo`, `docflow-web`, `docflow-api`, `docflow-worker-*`, `pgadmin`, `portainer`, `grafana`, `grafana-loki`, `grafana-alloy`). |
+| **Rede Interna Docker** | `shared-network` (`bridge`) | Comunicação isolada entre os contêineres (`postgres`, `redis`, `silo`, `docflow-web`, `docflow-api`, `docflow-worker-*`, `pgadmin`, `portainer`, `grafana`, `grafana-loki`, `grafana-alloy`). |
 | **Exposição Pública (HTTPS/TLS)** | **Cloudflare Tunnel (`cloudflared`)** | Conexão *outbound-only* do servidor para a borda da Cloudflare, expondo apenas `app.<dominio>`, `api.<dominio>` e `s3.<dominio>` sem abrir portas no roteador local. |
 
 ---
@@ -44,7 +44,7 @@ Considerando os **7.8 GiB de RAM**, **4 vCPUs** e **99 GB de disco**:
 
 1. **Memória RAM e CPU**:
    - **PostgreSQL (`postgres`)**: ~512 MB – 1 GB RAM.
-   - **Redis (`shared-redis`)**: limitado a `512 MB` (`redis_memory_limit`) e `1024` CPU shares via Terraform.
+   - **Redis (`redis`)**: limitado a `512 MB` (`redis_memory_limit`) e `1024` CPU shares via Terraform.
    - **Silo (`silo`)**: ~512 MB – 1 GB RAM.
    - **DocFlow API + Workers (`docflow-api`, `worker-io`, `worker-ai`)**: ~1.5 GB RAM somados.
    - **DocFlow Worker CPU (`docflow-worker-cpu` — FFmpeg/LibreOffice)**: limitado a `2048 MB` (2 GB RAM) e `2048` CPU shares com concorrência `1`, evitando que uma conversão de vídeo esgote a memória da VM.

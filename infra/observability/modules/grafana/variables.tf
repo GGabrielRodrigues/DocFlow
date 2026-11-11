@@ -38,7 +38,7 @@ variable "domain_dashboards" {
   default = {
     databases = {
       title           = "Databases"
-      container_regex = "postgres|shared-redis|silo|silo_setup"
+      container_regex = "postgres|redis|silo|silo_setup"
     }
     apps = {
       title           = "Apps (DocFlow)"

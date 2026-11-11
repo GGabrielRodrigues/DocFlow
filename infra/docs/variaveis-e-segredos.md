@@ -92,7 +92,7 @@ Credenciais do PostgreSQL, Redis, Silo (S3), além das credenciais base do daemo
 | `postgres_db` | Nome do banco de dados principal do DocFlow | `databases/modules/postgres`, `apps/modules/server` |
 | `postgres_user` | Usuário administrador do PostgreSQL | `databases/modules/postgres`, `apps/modules/server` |
 | `postgres_password` | Senha do usuário do PostgreSQL | `databases/modules/postgres`, `apps/modules/server` |
-| `redis_password` | Senha de autenticação do Redis (`shared-redis`) | `databases/modules/redis`, `apps/modules/server` |
+| `redis_password` | Senha de autenticação do Redis (`redis`) | `databases/modules/redis`, `apps/modules/server` |
 | `redis_port` | Porta interna do Redis (padrão `6379`) | `databases/modules/redis`, `apps/modules/server` |
 | `redis_memory_limit` | Limite de memória RAM do container Redis (em MB) | `databases/modules/redis` |
 | `redis_cpu_limit` | Quota de CPU do container Redis | `databases/modules/redis` |

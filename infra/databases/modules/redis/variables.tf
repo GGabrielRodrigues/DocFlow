@@ -1,7 +1,7 @@
 variable "container_name" {
   type        = string
   description = "Nome do contêiner Docker"
-  default     = "shared-redis"
+  default     = "redis"
 }
 
 variable "redis_password" {

@@ -27,7 +27,7 @@ module "apps_env" {
 
   # Conexões vindas de /databases
   database_url       = "postgresql+psycopg://${data.infisical_secrets.databases_secrets.secrets["postgres_user"].value}:${data.infisical_secrets.databases_secrets.secrets["postgres_password"].value}@postgres:5432/${data.infisical_secrets.databases_secrets.secrets["postgres_db"].value}"
-  redis_url          = "redis://default:${data.infisical_secrets.databases_secrets.secrets["redis_password"].value}@shared-redis:${data.infisical_secrets.databases_secrets.secrets["redis_port"].value}/0"
+  redis_url          = "redis://default:${data.infisical_secrets.databases_secrets.secrets["redis_password"].value}@redis:${data.infisical_secrets.databases_secrets.secrets["redis_port"].value}/0"
   s3_internal_url    = "http://silo:9000"
   s3_public_endpoint = data.infisical_secrets.databases_secrets.secrets["silo_public_endpoint"].value
   s3_access_key      = data.infisical_secrets.databases_secrets.secrets["silo_docflow_app_user"].value
