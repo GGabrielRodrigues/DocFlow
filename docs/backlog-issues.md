@@ -53,10 +53,11 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 - [x] Descrever o fluxo de estado remoto e o inventário completo de variáveis/segredos no Infisical (`infra/variaveis-e-segredos.md` e `infra/AGENTS.md`)
 - [x] Listar providers Terraform usados: `kreuzwerker/docker` (`~> 3.0.1`) e `infisical/infisical` (`~> 0.16.0`)
 
-### DOC-08 · Estratégia de Multi-tenancy (`apps/server/multi-tenancy.md`: coluna `institution_id` + RLS) `[M0][docs][S]`
-- [x] Decisão documentada em `apps/server/multi-tenancy.md`: tabela compartilhada com coluna `institution_id` obrigatória + Row-Level Security (RLS) do PostgreSQL como defesa em profundidade e isolamento por prefixo no Silo (S3)
+### DOC-08 · Estratégia de Multi-tenancy (`docs/multi-tenancy.md`: coluna `institution_id` + RLS) `[M0][docs][S]`
+- [x] Decisão documentada em `docs/multi-tenancy.md`: tabela compartilhada com coluna `institution_id` obrigatória + Row-Level Security (RLS) do PostgreSQL como defesa em profundidade e isolamento por prefixo no Silo (S3)
 
-### DOC-09 · ADR-007: Estratégia de upload de 10 GB (multipart direto no S3) `[M0][docs][S]`
+### DOC-09 · Estratégia de upload de 10 GB (`docs/upload-multipart.md`: multipart direto no Silo/S3) `[M0][docs][S]`
+- [x] Estratégia documentada em `docs/upload-multipart.md`: partes de 50 MB (compatível com o limite de 100 MB do Cloudflare Tunnel), 3 envios paralelos, validação dupla de 10 GB / 2h30, CORS com exposição de `ETag` e limpeza de uploads abandonados em 24h
 
 ### DOC-10 · Modelo de domínio e diagrama ER `[M0][docs][M]`
 Entidades: Institution, User, Media, Transcript, Speaker, TranscriptSegment, Template, TemplateVersion, Document, DocumentVersion, AuditLog, Job, Usage.

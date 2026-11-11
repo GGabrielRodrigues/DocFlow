@@ -2,8 +2,10 @@
 
 Backend do **DocFlow** em **Python 3.12+**, estruturado como um **Monolito Modular** que reúne a **API HTTP (FastAPI)** e os **Workers assíncronos (Celery)** no mesmo código-base.
 
-> **Documentação Complementar em `apps/server/`:**
-> - [`apps/server/multi-tenancy.md`](./multi-tenancy.md) — Estratégia de isolamento multi-tenant (`institution_id` + PostgreSQL RLS + prefixos no Silo/S3).
+> **Documentação Complementar em `docs/`:**
+> - [`docs/multi-tenancy.md`](../../docs/multi-tenancy.md) — Estratégia de isolamento multi-tenant (`institution_id` + PostgreSQL RLS + prefixos no Silo/S3).
+> - [`docs/upload-multipart.md`](../../docs/upload-multipart.md) — Estratégia de upload multipart de até 10 GB / 2h30 direto no Silo via Cloudflare Tunnel.
+> - [`docs/provedores-ia.md`](../../docs/provedores-ia.md) — Interfaces `TranscriptionProvider` e `LLMProvider`, comparativo e plano de troca.
 
 ---
 
