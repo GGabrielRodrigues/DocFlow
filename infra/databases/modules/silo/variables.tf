@@ -21,6 +21,12 @@ variable "external_console_port" {
   default     = 9001
 }
 
+variable "silo_console_public_url" {
+  type        = string
+  description = "URL pública HTTPS da Console Web do Silo (ex.: https://docflow-silo.gabrieldevops.dev.br). Vazio = sem redirect."
+  default     = ""
+}
+
 variable "silo_root_user" {
   type        = string
   description = "Usuário root do Silo"

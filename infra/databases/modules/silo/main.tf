@@ -31,11 +31,13 @@ resource "docker_container" "silo" {
     container_path = "/data"
   }
 
-  env = [
+  env = compact([
     "MINIO_ROOT_USER=${var.silo_root_user}",
     "MINIO_ROOT_PASSWORD=${var.silo_root_password}",
-    "MINIO_API_CORS_ALLOW_ORIGIN=*"
-  ]
+    "MINIO_API_CORS_ALLOW_ORIGIN=*",
+    # URL pública da Console (necessária atrás de proxy reverso/Cloudflare Tunnel)
+    var.silo_console_public_url != "" ? "MINIO_BROWSER_REDIRECT_URL=${var.silo_console_public_url}" : ""
+  ])
 
   command = ["server", "/data", "--console-address", ":9001"]
   restart = "always"
@@ -70,17 +72,19 @@ resource "docker_container" "silo_setup" {
 
   command = [
     <<-EOT
-      until mcli alias set target http://${docker_container.silo.name}:9000 ${var.silo_root_user} ${var.silo_root_password}; do
+      until mc alias set target http://${docker_container.silo.name}:9000 ${var.silo_root_user} ${var.silo_root_password} || mcli alias set target http://${docker_container.silo.name}:9000 ${var.silo_root_user} ${var.silo_root_password}; do
         echo "Aguardando Silo iniciar..."
         sleep 2
       done
-      mcli mb --ignore-existing target/media-raw
-      mcli mb --ignore-existing target/media-processed
-      mcli mb --ignore-existing target/documents
-      mcli version enable target/documents
-      mcli mb --ignore-existing target/loki-data
-      mcli admin user add target ${var.silo_docflow_app_user} ${var.silo_docflow_app_password}
-      mcli admin policy attach target readwrite --user ${var.silo_docflow_app_user} || true
+      CLI_BIN="mc"
+      command -v mc >/dev/null 2>&1 || CLI_BIN="mcli"
+      $CLI_BIN mb --ignore-existing target/media-raw
+      $CLI_BIN mb --ignore-existing target/media-processed
+      $CLI_BIN mb --ignore-existing target/documents
+      $CLI_BIN version enable target/documents
+      $CLI_BIN mb --ignore-existing target/loki-data
+      $CLI_BIN admin user add target ${var.silo_docflow_app_user} ${var.silo_docflow_app_password}
+      $CLI_BIN admin policy attach target readwrite --user ${var.silo_docflow_app_user} || true
     EOT
   ]
 
