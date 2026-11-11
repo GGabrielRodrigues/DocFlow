@@ -12,6 +12,7 @@ module "databases_env" {
   silo_root_password        = data.infisical_secrets.databases_secrets.secrets["silo_root_password"].value
   silo_docflow_app_user     = data.infisical_secrets.databases_secrets.secrets["silo_docflow_app_user"].value
   silo_docflow_app_password = data.infisical_secrets.databases_secrets.secrets["silo_docflow_app_password"].value
+  silo_console_public_url   = try(data.infisical_secrets.databases_secrets.secrets["silo_console_public_url"].value, "")
 
   # PostgreSQL
   postgres_db       = data.infisical_secrets.databases_secrets.secrets["postgres_db"].value

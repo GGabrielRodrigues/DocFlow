@@ -1,0 +1,27 @@
+repos:
+  - repo: local
+    hooks:
+      - id: server-ruff
+        name: server ruff
+        entry: poetry --directory apps/server run ruff check src tests
+        language: system
+        pass_filenames: false
+        files: ^apps/server/(src|tests)/
+      - id: server-mypy
+        name: server mypy
+        entry: poetry --directory apps/server run mypy src
+        language: system
+        pass_filenames: false
+        files: ^apps/server/src/
+      - id: server-import-linter
+        name: server import-linter
+        entry: poetry --directory apps/server run lint-imports
+        language: system
+        pass_filenames: false
+        files: ^apps/server/src/
+      - id: server-tests
+        name: server tests
+        entry: poetry --directory apps/server run pytest --cov=docflow --cov-report=term-missing
+        language: system
+        pass_filenames: false
+        files: ^apps/server/(src|tests)/

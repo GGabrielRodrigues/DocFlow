@@ -100,6 +100,7 @@ Credenciais do PostgreSQL, Redis, Silo (S3), além das credenciais base do daemo
 | `silo_root_password` | Senha root do Silo | `databases/modules/silo` |
 | `silo_docflow_app_user` | Access Key exclusiva da aplicação DocFlow para leitura/escrita nos buckets `media-raw`, `media-processed` e `documents` | `databases/modules/silo`, `apps/modules/server` |
 | `silo_docflow_app_password` | Secret Key exclusiva da aplicação DocFlow | `databases/modules/silo`, `apps/modules/server` |
+| `silo_console_public_url` | *(Opcional)* URL pública HTTPS da Console Web do Silo via Cloudflare Tunnel (ex.: `https://docflow-silo.<dominio>`), injetada como `MINIO_BROWSER_REDIRECT_URL` | `databases/modules/silo` |
 | `silo_public_endpoint` | URL pública HTTPS do Silo via Cloudflare Tunnel (ex.: `https://s3.<dominio>`) usada para assinar URLs de upload multipart | `apps/modules/server` |
 
 ### 3.2. Pasta `/apps`
