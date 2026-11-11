@@ -37,9 +37,8 @@ jobs:
           ./gitleaks detect --source=".." --gitleaks-ignore-path=".gitleaksignore" --verbose --redact
 
       - name: TruffleHog Secret Scan
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./infra
+        run: |
+          docker run --rm -v "${GITHUB_WORKSPACE}/infra:/workdir" trufflesecurity/trufflehog:latest filesystem /workdir --exclude-paths=/workdir/.trufflehogignore --fail
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

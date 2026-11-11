@@ -17,7 +17,7 @@ gitleaks:
 # 3. TruffleHog
 trufflehog:
 	@echo "\n🔍 [3/6] Executando TruffleHog (Secret Scan)..."
-	docker run --rm -v $(CURDIR):/workdir trufflesecurity/trufflehog:latest filesystem /workdir --exclude-paths=/workdir/.trufflehogignore
+	docker run --rm -v $(CURDIR):/workdir trufflesecurity/trufflehog:latest filesystem /workdir --exclude-paths=/workdir/.trufflehogignore --fail
 
 # 4. TFLint
 tflint:
