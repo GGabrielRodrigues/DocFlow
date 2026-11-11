@@ -14,7 +14,7 @@ This is the canonical project structure. Start with task-relevant files below. O
 - `apps/web/vite.config.ts` - Vite configuration with React, Tailwind CSS v4, and Figma Make plugins plus the `@` alias for `src`
 - `apps/server/` - Python 3.12+ / FastAPI modular monolith and Celery workers
 - `contracts/` - Shared API contracts (OpenAPI)
-- `infra/` - Infrastructure as Code (Terraform, Docker Compose, bootstrap)
+- `infra/` - Infrastructure as Code (Terraform, Infisical, Docker, Silo). **Read `infra/AGENTS.md` before modifying anything in `infra/` and ALWAYS run `make -C infra check` to validate before presenting results.**
 - `docs/` - Requirements, ADRs, domain model, and backlog (`docs/backlog-issues.md`)
 
 ## Dependencies

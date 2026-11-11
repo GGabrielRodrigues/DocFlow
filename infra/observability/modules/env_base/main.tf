@@ -21,7 +21,7 @@ module "grafana_loki" {
   source = "../grafana_loki"
 
   loki_s3_access_key    = var.loki_s3_access_key
-  loki_s3_secret_key    = var.loki_s3_secret_key
+  loki_s3_secret_key    = var.loki_s3_secret_key # gitleaks:allow
   loki_s3_endpoint      = var.loki_s3_endpoint
   loki_s3_bucket        = var.loki_s3_bucket
   loki_port             = var.loki_port

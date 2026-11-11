@@ -39,7 +39,7 @@ resource "docker_container" "loki" {
       s3_endpoint      = var.loki_s3_endpoint
       s3_bucket        = var.loki_s3_bucket
       s3_access_key    = var.loki_s3_access_key
-      s3_secret_key    = var.loki_s3_secret_key
+      s3_secret_key    = var.loki_s3_secret_key # gitleaks:allow
       retention_period = var.loki_retention_period
     })
     file = "/etc/loki/local-config.yaml"

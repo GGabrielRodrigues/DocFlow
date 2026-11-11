@@ -19,11 +19,11 @@ module "server" {
   s3_internal_url        = var.s3_internal_url
   s3_public_endpoint     = var.s3_public_endpoint
   s3_access_key          = var.s3_access_key
-  s3_secret_key          = var.s3_secret_key
-  jwt_secret_key         = var.jwt_secret_key
+  s3_secret_key          = var.s3_secret_key  # gitleaks:allow
+  jwt_secret_key         = var.jwt_secret_key # gitleaks:allow
   cors_allowed_origins   = var.cors_allowed_origins
   transcription_provider = var.transcription_provider
-  deepgram_api_key       = var.deepgram_api_key
+  deepgram_api_key       = var.deepgram_api_key # gitleaks:allow
   llm_provider           = var.llm_provider
-  gemini_api_key         = var.gemini_api_key
+  gemini_api_key         = var.gemini_api_key # gitleaks:allow
 }
