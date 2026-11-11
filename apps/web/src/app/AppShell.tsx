@@ -254,7 +254,40 @@ export function AppShell() {
     },
     onSuccess: () => {
       refreshStore()
-      notify("Gravação enviada com sucesso.")
+      notify("Gravação enviada e adicionada à fila de processamento.")
+    },
+  })
+
+  const deleteMediaMutation = useMutation({
+    mutationFn: (mediaId: string) => {
+      if (!currentUser) throw new Error("Sessão inválida.")
+      return docflowApi.deleteMedia(currentUser, mediaId)
+    },
+    onSuccess: () => {
+      refreshStore()
+      notify("Mídia e transcrições derivadas excluídas com sucesso.")
+    },
+  })
+
+  const cancelMediaJobMutation = useMutation({
+    mutationFn: (mediaId: string) => {
+      if (!currentUser) throw new Error("Sessão inválida.")
+      return docflowApi.cancelMediaJob(currentUser, mediaId)
+    },
+    onSuccess: () => {
+      refreshStore()
+      notify("Processamento cancelado.")
+    },
+  })
+
+  const retryMediaJobMutation = useMutation({
+    mutationFn: (mediaId: string) => {
+      if (!currentUser) throw new Error("Sessão inválida.")
+      return docflowApi.retryMediaJob(currentUser, mediaId)
+    },
+    onSuccess: () => {
+      refreshStore()
+      notify("Reprocessamento iniciado na fila.")
     },
   })
 
@@ -484,6 +517,16 @@ export function AppShell() {
                   onUpload={(mediaItem) =>
                     uploadMediaMutation.mutate(mediaItem)
                   }
+                  onDelete={(mediaId) => deleteMediaMutation.mutate(mediaId)}
+                  onCancelJob={(mediaId) =>
+                    cancelMediaJobMutation.mutate(mediaId)
+                  }
+                  onRetryJob={(mediaId) =>
+                    retryMediaJobMutation.mutate(mediaId)
+                  }
+                  onDownload={() => refreshStore()}
+                  onRefresh={refreshStore}
+                  onNotify={notify}
                 />
               }
             />

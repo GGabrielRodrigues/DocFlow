@@ -473,6 +473,9 @@ Cobre RF-05, RN-05. Depende de BE-08.
 
 ### FE-07 · Biblioteca de mídias `[M1][frontend][feature][M]`
 Cobre RF-07, RF-09. Lista, filtros, status do processamento em tempo real (SSE/polling), pré-visualização, download e exclusão.
+- [x] Listagem e filtros por busca textual, formato (`Vídeo`/`Áudio`) e status de processamento
+- [x] Acompanhamento de status e progresso em tempo real (SSE/polling), cancelamento e reprocessamento de jobs (`RF-09`)
+- [x] Pré-visualização em modal com player nativo (`<video>`/`<audio>`), download via URL pré-assinada e exclusão com confirmação (`RF-07`, `RN-14`)
 
 ### FE-08 · Solicitar e acompanhar transcrição `[M2][frontend][feature][M]`
 Cobre RF-09, RF-10. Depende de BE-11.
