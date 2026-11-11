@@ -43,4 +43,7 @@ Por padrão, o servidor Vite sobe em `http://localhost:8443` (ou na porta defini
 - `pnpm run dev` (ou `npm run dev`): Inicia o servidor de desenvolvimento com HMR.
 - `pnpm run build` (ou `npm run build`): Gera a build de produção em `dist/`.
 - `pnpm run preview` (ou `npm run preview`): Visualiza localmente a build de produção.
-- `pnpm run format` (ou `npm run format`): Formata os arquivos com `oxfmt`.
+- `pnpm run typecheck`: Verifica a tipagem estática com TypeScript (`tsc --noEmit`).
+- `pnpm run lint`: Executa a análise estática de código com `oxlint`.
+- `pnpm run format` / `pnpm run format:check`: Formata ou verifica a formatação com `oxfmt`.
+- `pnpm run test` / `pnpm run test:watch`: Executa a suíte de testes com `vitest` e `@testing-library/react`.

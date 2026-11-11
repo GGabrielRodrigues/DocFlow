@@ -440,11 +440,11 @@ Cobre RF-23. Preenche o modelo DOCX, converte para PDF e salva no storage.
 # 🎨 FRONTEND (React / TypeScript)
 
 ### FE-01 · Preparar o frontend para integração `[M0][frontend][chore][M]`
-- [ ] Migrar protótipo para `apps/web`; dividir `App.tsx` (692 linhas) em módulos por funcionalidade (`auth`, `media`, `transcripts`, `templates`, `documents`, `admin`)
-- [ ] React Router, TanStack Query, cliente HTTP, tratamento global de erro
-- [ ] Remover `localStorage` como fonte de dados e **nunca armazenar senhas**
-- [ ] Variáveis via `VITE_*` (somente públicas) — segredos jamais no front
-- [ ] ESLint/oxlint, Prettier/oxfmt, Vitest e Testing Library
+- [x] Migrar protótipo para `apps/web`; dividir `App.tsx` (692 linhas) em módulos por funcionalidade (`auth`, `media`, `transcripts`, `templates`, `documents`, `admin`)
+- [x] React Router, TanStack Query, cliente HTTP, tratamento global de erro
+- [x] Remover `localStorage` como fonte de dados e **nunca armazenar senhas**
+- [x] Variáveis via `VITE_*` (somente públicas) — segredos jamais no front
+- [x] ESLint/oxlint, Prettier/oxfmt, Vitest e Testing Library
 
 ### FE-02 · Design system e acessibilidade `[M1][frontend][feature][M]`
 Cobre RNF-10, RNF-11.
