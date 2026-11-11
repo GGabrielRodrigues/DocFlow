@@ -1,8 +1,8 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated, Any
 from uuid import uuid4
 
-from sqlalchemy import JSON, DateTime, ForeignKey, String, event
+from sqlalchemy import JSON, DateTime, ForeignKey, String, UniqueConstraint, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, declared_attr, mapped_column
 
 from docflow.domain.audit import AuditLog, AuditLogImmutableError
@@ -16,12 +16,18 @@ class Base(DeclarativeBase):
 
 class InstitutionModel(Base):
     __tablename__ = "institutions"
+    __table_args__ = (UniqueConstraint("cnpj", name="uq_institutions_cnpj"),)
 
     id: Mapped[Id] = mapped_column(default=lambda: str(uuid4()))
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    institution_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    cnpj: Mapped[str] = mapped_column(String(14), nullable=False)
+    email: Mapped[str] = mapped_column(String(320), nullable=False)
+    phone: Mapped[str | None] = mapped_column(String(50))
+    address: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
     )
 
@@ -35,6 +41,25 @@ class TenantScopedMixin:
             nullable=False,
             index=True,
         )
+
+
+class UserModel(TenantScopedMixin, Base):
+    __tablename__ = "users"
+    __table_args__ = (
+        UniqueConstraint("institution_id", "email", name="uq_users_institution_email"),
+    )
+
+    id: Mapped[Id] = mapped_column(default=lambda: str(uuid4()))
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(320), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[str] = mapped_column(String(20), nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        nullable=False,
+    )
 
 
 class AuditLogModel(TenantScopedMixin, Base):
@@ -72,7 +97,7 @@ class AuditLogModel(TenantScopedMixin, Base):
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(UTC),
         nullable=False,
         index=True,
     )
@@ -127,4 +152,3 @@ def _prevent_audit_log_bulk_mutation(orm_execute_state: Any) -> None:
                 raise AuditLogImmutableError(
                     "Operações em lote de alteração ou exclusão em AuditLog são proibidas (append-only)."
                 )
-

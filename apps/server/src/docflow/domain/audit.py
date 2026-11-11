@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any, Protocol
 from uuid import uuid4
@@ -33,9 +33,7 @@ class AuditLog:
     resource_id: str | None = None
     details: dict[str, Any] = field(default_factory=dict)
     ip_address: str | None = None
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def __post_init__(self) -> None:
         if not self.institution_id or not self.institution_id.strip():
@@ -56,16 +54,13 @@ class AuditLogFilter:
 
 
 class AuditLogRepositoryProtocol(Protocol):
-    def record(self, audit_log: AuditLog) -> AuditLog:
-        ...
+    def record(self, audit_log: AuditLog) -> AuditLog: ...
 
-    def get_by_id(self, log_id: str) -> AuditLog | None:
-        ...
+    def get_by_id(self, log_id: str) -> AuditLog | None: ...
 
     def list(
         self,
         filter_params: AuditLogFilter | None = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> tuple[list[AuditLog], int]:
-        ...
+    ) -> tuple[list[AuditLog], int]: ...

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -51,22 +51,16 @@ class AuditLogRepository(TenantRepository[AuditLogModel]):
                 stmt = stmt.where(AuditLogModel.action == filter_params.action)
                 count_stmt = select(func.count()).select_from(stmt.subquery())
             if filter_params.resource_type:
-                stmt = stmt.where(
-                    AuditLogModel.resource_type == filter_params.resource_type
-                )
+                stmt = stmt.where(AuditLogModel.resource_type == filter_params.resource_type)
                 count_stmt = select(func.count()).select_from(stmt.subquery())
             if filter_params.user_id:
                 stmt = stmt.where(AuditLogModel.user_id == filter_params.user_id)
                 count_stmt = select(func.count()).select_from(stmt.subquery())
             if filter_params.start_date:
-                stmt = stmt.where(
-                    AuditLogModel.created_at >= filter_params.start_date
-                )
+                stmt = stmt.where(AuditLogModel.created_at >= filter_params.start_date)
                 count_stmt = select(func.count()).select_from(stmt.subquery())
             if filter_params.end_date:
-                stmt = stmt.where(
-                    AuditLogModel.created_at <= filter_params.end_date
-                )
+                stmt = stmt.where(AuditLogModel.created_at <= filter_params.end_date)
                 count_stmt = select(func.count()).select_from(stmt.subquery())
 
         total = self.session.scalar(count_stmt) or 0
@@ -81,8 +75,8 @@ class AuditLogRepository(TenantRepository[AuditLogModel]):
         offset = max(0, (page - 1) * page_size)
         stmt = stmt.offset(offset).limit(page_size)
 
-        models = list(self.session.scalars(stmt))
-        return [m.to_domain() for m in models], total
+        models = list(self.session.scalars(stmt).all())
+        return [cast(AuditLogModel, m).to_domain() for m in models], total
 
     def update(self, *args: Any, **kwargs: Any) -> Any:
         raise AuditLogImmutableError(

@@ -16,7 +16,15 @@ export type AuthView = 'welcome' | 'login' | 'institution' | 'first-user'
 
 export type DocumentStatus = 'Rascunho' | 'Em validação' | 'Aprovado' | 'Devolvido'
 
-export type MediaStatus = 'Pronto' | 'Em processamento' | 'Transcrito'
+export type MediaStatus =
+  | 'Na fila'
+  | 'Em processamento'
+  | 'Pronto'
+  | 'Transcrito'
+  | 'Falhou'
+  | 'Cancelado'
+
+export type MediaKind = 'Vídeo' | 'Áudio'
 
 export type Institution = {
   id: string
@@ -74,9 +82,15 @@ export type MediaItem = {
   institutionId: string
   title: string
   fileName: string
+  kind?: MediaKind
+  mimeType?: string
   durationSeconds: number
   sizeBytes: number
   status: MediaStatus
+  progressPercent?: number
+  jobId?: string
+  errorMessage?: string
+  previewUrl?: string
   uploadedBy: string
   createdAt: string
 }

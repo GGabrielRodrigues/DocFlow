@@ -1,12 +1,12 @@
 from dataclasses import FrozenInstanceError
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
 
 from docflow.domain.audit import (
     AuditAction,
     AuditLog,
     AuditLogFilter,
-    AuditLogImmutableError,
 )
 
 
@@ -30,7 +30,7 @@ def test_audit_log_creation_with_defaults() -> None:
 
 
 def test_audit_log_with_full_details() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     log = AuditLog(
         id="audit-uuid-1",
         institution_id="inst-123",

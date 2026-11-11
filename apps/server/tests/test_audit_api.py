@@ -1,6 +1,5 @@
 from collections.abc import Generator
-from datetime import datetime, timedelta, timezone
-from uuid import uuid4
+from datetime import UTC, datetime
 
 import pytest
 from fastapi.testclient import TestClient
@@ -36,8 +35,20 @@ def app_and_session() -> Generator[tuple[TestClient, Session], None, None]:
 
     with Session(engine) as session:
         # Cria instituições de teste
-        inst_a = InstitutionModel(id="tenant-a", name="Instituição A")
-        inst_b = InstitutionModel(id="tenant-b", name="Instituição B")
+        inst_a = InstitutionModel(
+            id="tenant-a",
+            name="Instituição A",
+            institution_type="SCHOOL",
+            cnpj="11222333000181",
+            email="inst_a@example.com",
+        )
+        inst_b = InstitutionModel(
+            id="tenant-b",
+            name="Instituição B",
+            institution_type="SCHOOL",
+            cnpj="22333444000192",
+            email="inst_b@example.com",
+        )
         session.add_all([inst_a, inst_b])
         session.commit()
 
@@ -291,7 +302,7 @@ def test_audit_logs_period_filter_via_api(app_and_session) -> None:
                 institution_id="tenant-a",
                 action="login",
                 resource_type="auth",
-                created_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=timezone.utc),
+                created_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=UTC),
             )
         )
         repo.record(
@@ -299,7 +310,7 @@ def test_audit_logs_period_filter_via_api(app_and_session) -> None:
                 institution_id="tenant-a",
                 action="login",
                 resource_type="auth",
-                created_at=datetime(2026, 5, 10, 12, 0, 0, tzinfo=timezone.utc),
+                created_at=datetime(2026, 5, 10, 12, 0, 0, tzinfo=UTC),
             )
         )
         s.commit()
@@ -319,4 +330,3 @@ def test_audit_logs_period_filter_via_api(app_and_session) -> None:
     )
     assert res2.status_code == 200
     assert res2.json()["total"] == 1
-

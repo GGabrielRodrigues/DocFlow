@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { Icon, type IconName } from "@/components/Icon"
-import { Brand } from "@/components/ui"
+import { Brand, SkipLink, Toast } from "@/components/ui"
 import { firstName, initials, shortRole } from "@/lib/formatters"
 import { onGlobalApiError } from "@/lib/http-client"
 import { docflowApi } from "@/lib/mock-api"
@@ -12,6 +12,7 @@ import type {
   DocumentItem,
   DocumentStatus,
   Institution,
+  MediaItem,
   Page,
   Store,
 } from "@/lib/types"
@@ -27,13 +28,15 @@ import { MediaPage } from "@/modules/media/MediaPage"
 import { TemplatesPage } from "@/modules/templates/TemplatesPage"
 import { TranscriptsPage } from "@/modules/transcripts/TranscriptsPage"
 
-const navItems: {
+interface NavItemConfig {
   id: Page
   path: string
   label: string
   icon: IconName
   adminOnly?: boolean
-}[] = [
+}
+
+const navItems: NavItemConfig[] = [
   { id: "dashboard", path: "/", label: "Visão geral", icon: "grid" },
   { id: "documents", path: "/documents", label: "Documentos", icon: "file" },
   {
@@ -119,6 +122,17 @@ export function AppShell() {
     const timer = window.setTimeout(() => setToast(""), 3200)
     return () => window.clearTimeout(timer)
   }, [toast])
+
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false)
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [sidebarOpen])
 
   const notify = (message: string) => setToast(message)
 
@@ -233,6 +247,50 @@ export function AppShell() {
     },
   })
 
+  const uploadMediaMutation = useMutation({
+    mutationFn: (mediaItem: MediaItem) => {
+      if (!currentUser) throw new Error("Sessão inválida.")
+      return docflowApi.uploadMedia(currentUser, mediaItem)
+    },
+    onSuccess: () => {
+      refreshStore()
+      notify("Gravação enviada e adicionada à fila de processamento.")
+    },
+  })
+
+  const deleteMediaMutation = useMutation({
+    mutationFn: (mediaId: string) => {
+      if (!currentUser) throw new Error("Sessão inválida.")
+      return docflowApi.deleteMedia(currentUser, mediaId)
+    },
+    onSuccess: () => {
+      refreshStore()
+      notify("Mídia e transcrições derivadas excluídas com sucesso.")
+    },
+  })
+
+  const cancelMediaJobMutation = useMutation({
+    mutationFn: (mediaId: string) => {
+      if (!currentUser) throw new Error("Sessão inválida.")
+      return docflowApi.cancelMediaJob(currentUser, mediaId)
+    },
+    onSuccess: () => {
+      refreshStore()
+      notify("Processamento cancelado.")
+    },
+  })
+
+  const retryMediaJobMutation = useMutation({
+    mutationFn: (mediaId: string) => {
+      if (!currentUser) throw new Error("Sessão inválida.")
+      return docflowApi.retryMediaJob(currentUser, mediaId)
+    },
+    onSuccess: () => {
+      refreshStore()
+      notify("Reprocessamento iniciado na fila.")
+    },
+  })
+
   if (!currentUser || !institution) {
     return (
       <>
@@ -258,14 +316,7 @@ export function AppShell() {
             notify("Instituição e conta criadas com sucesso.")
           }}
         />
-        {toast && (
-          <div className="toast">
-            <span>
-              <Icon name="check" size={16} />
-            </span>
-            {toast}
-          </div>
-        )}
+        <Toast message={toast} onDismiss={() => setToast("")} />
       </>
     )
   }
@@ -295,10 +346,15 @@ export function AppShell() {
 
   return (
     <div className="app-shell">
-      <aside className={`sidebar ${sidebarOpen ? "sidebar--open" : ""}`}>
+      <SkipLink targetId="main-content" />
+      <aside
+        className={`sidebar ${sidebarOpen ? "sidebar--open" : ""}`}
+        aria-label="Menu lateral institucional"
+      >
         <div className="sidebar__top">
           <Brand light />
           <button
+            type="button"
             className="icon-button sidebar__close"
             onClick={() => setSidebarOpen(false)}
             aria-label="Fechar menu"
@@ -306,25 +362,30 @@ export function AppShell() {
             <Icon name="close" />
           </button>
         </div>
-        <nav className="nav">
+        <nav className="nav" aria-label="Menu principal">
           <span className="nav__label">MENU PRINCIPAL</span>
           {navItems
             .filter((item) => !item.adminOnly || isAdmin)
-            .map((item) => (
-              <button
-                key={item.id}
-                className={`nav__item ${
-                  location.pathname === item.path ? "nav__item--active" : ""
-                }`}
-                onClick={() => navigateToPage(item.id)}
-              >
-                <Icon name={item.icon} />
-                <span>{item.label}</span>
-                {item.id === "validations" && pendingValidationsCount > 0 && (
-                  <b>{pendingValidationsCount}</b>
-                )}
-              </button>
-            ))}
+            .map((item) => {
+              const isActive = location.pathname === item.path
+              return (
+                <button
+                  type="button"
+                  key={item.id}
+                  className={`nav__item ${isActive ? "nav__item--active" : ""}`}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => navigateToPage(item.id)}
+                >
+                  <Icon name={item.icon} />
+                  <span>{item.label}</span>
+                  {item.id === "validations" && pendingValidationsCount > 0 && (
+                    <b aria-label={`${pendingValidationsCount} pendentes`}>
+                      {pendingValidationsCount}
+                    </b>
+                  )}
+                </button>
+              )
+            })}
         </nav>
         <div className="sidebar__notice">
           <Icon name="shield" size={18} />
@@ -333,8 +394,15 @@ export function AppShell() {
             <small>Autenticação e dados em memória.</small>
           </span>
         </div>
-        <button className="sidebar__profile" onClick={logout}>
-          <span className="avatar">{initials(currentUser.name)}</span>
+        <button
+          type="button"
+          className="sidebar__profile"
+          onClick={logout}
+          aria-label={`Encerrar sessão de ${currentUser.name}`}
+        >
+          <span className="avatar" aria-hidden="true">
+            {initials(currentUser.name)}
+          </span>
           <span>
             <strong>{currentUser.name}</strong>
             <small>{shortRole(currentUser.role)}</small>
@@ -344,22 +412,25 @@ export function AppShell() {
       </aside>
       {sidebarOpen && (
         <button
+          type="button"
           className="sidebar-backdrop"
           onClick={() => setSidebarOpen(false)}
           aria-label="Fechar menu"
         />
       )}
-      <main className="main">
+      <div className="main">
         <header className="topbar">
           <button
+            type="button"
             className="icon-button menu-button"
             onClick={() => setSidebarOpen(true)}
             aria-label="Abrir menu"
+            aria-expanded={sidebarOpen}
           >
             <Icon name="menu" />
           </button>
           <div className="topbar__institution">
-            <span className="topbar__icon">
+            <span className="topbar__icon" aria-hidden="true">
               <Icon name="building" size={18} />
             </span>
             <span>
@@ -372,12 +443,12 @@ export function AppShell() {
               <small>Olá,</small>
               <strong>{firstName(currentUser.name)}</strong>
             </span>
-            <span className="avatar avatar--small">
+            <span className="avatar avatar--small" aria-hidden="true">
               {initials(currentUser.name)}
             </span>
           </div>
         </header>
-        <div className="content">
+        <main id="main-content" className="content" tabIndex={-1}>
           <Routes>
             <Route
               path="/"
@@ -441,7 +512,21 @@ export function AppShell() {
                 <MediaPage
                   media={scopedMedia}
                   users={store.users}
+                  currentUser={currentUser}
                   onNavigate={navigateToPage}
+                  onUpload={(mediaItem) =>
+                    uploadMediaMutation.mutate(mediaItem)
+                  }
+                  onDelete={(mediaId) => deleteMediaMutation.mutate(mediaId)}
+                  onCancelJob={(mediaId) =>
+                    cancelMediaJobMutation.mutate(mediaId)
+                  }
+                  onRetryJob={(mediaId) =>
+                    retryMediaJobMutation.mutate(mediaId)
+                  }
+                  onDownload={() => refreshStore()}
+                  onRefresh={refreshStore}
+                  onNotify={notify}
                 />
               }
             />
@@ -484,16 +569,9 @@ export function AppShell() {
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </div>
-      </main>
-      {toast && (
-        <div className="toast">
-          <span>
-            <Icon name="check" size={16} />
-          </span>
-          {toast}
-        </div>
-      )}
+        </main>
+      </div>
+      <Toast message={toast} onDismiss={() => setToast("")} />
     </div>
   )
 }

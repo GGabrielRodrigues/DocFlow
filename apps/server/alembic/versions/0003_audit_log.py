@@ -1,17 +1,18 @@
 """Create audit_logs table with append-only restrictions and RLS.
 
-Revision ID: 0002_audit_log
-Revises: 0001_initial
+Revision ID: 0003_audit_log
+Revises: 0002_identity_registration
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
+from alembic import op
 
-revision: str = "0002_audit_log"
-down_revision: Union[str, Sequence[str], None] = "0001_initial"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "0003_audit_log"
+down_revision: str | Sequence[str] | None = "0002_identity_registration"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

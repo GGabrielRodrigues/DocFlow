@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import pytest
@@ -24,9 +24,13 @@ def db_session() -> Session:
 
 
 def _create_institution(session: Session, inst_id: str | None = None) -> str:
+    unique_num = f"{uuid4().int % 10000000000000:014d}"
     institution = InstitutionModel(
         id=inst_id or str(uuid4()),
         name=f"Inst-{uuid4().hex[:6]}",
+        institution_type="SCHOOL",
+        cnpj=unique_num,
+        email=f"inst_{uuid4().hex[:6]}@example.com",
     )
     session.add(institution)
     session.commit()
@@ -144,7 +148,7 @@ def test_audit_repository_filtering_and_pagination(db_session: Session) -> None:
     inst_id = _create_institution(db_session)
     repo = AuditLogRepository(db_session, inst_id)
 
-    base_time = datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+    base_time = datetime(2026, 1, 1, 12, 0, 0, tzinfo=UTC)
 
     # Cria múltiplos logs em datas distintas
     for i in range(10):
@@ -243,7 +247,5 @@ def test_audit_repository_blocks_mutations_and_deletions(db_session: Session) ->
 
     # 5. Tentativa de bulk update via SQLAlchemy
     with pytest.raises(AuditLogImmutableError):
-        db_session.execute(
-            update(AuditLogModel).values(action="tampered")
-        )
+        db_session.execute(update(AuditLogModel).values(action="tampered"))
     db_session.rollback()

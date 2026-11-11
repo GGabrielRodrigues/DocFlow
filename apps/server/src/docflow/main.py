@@ -7,10 +7,15 @@ from docflow.api.router import create_api_router
 from docflow.core.config import Settings, get_settings
 from docflow.core.logging import configure_logging
 from docflow.core.middleware import RequestIdMiddleware
+from docflow.infra.database.models import Base
+from docflow.infra.database.session import create_session_factory
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or get_settings()
+    session_factory = create_session_factory(app_settings)
+    if app_settings.database_url.startswith("sqlite"):
+        Base.metadata.create_all(session_factory.kw["bind"])
     configure_logging(app_settings.log_level)
     app = FastAPI(
         title="DocFlow API",
@@ -21,7 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.dependency_overrides[get_settings] = lambda: app_settings
     app.add_middleware(RequestIdMiddleware)
-    app.include_router(create_api_router())
+    app.include_router(create_api_router(session_factory))
     return app
 
 

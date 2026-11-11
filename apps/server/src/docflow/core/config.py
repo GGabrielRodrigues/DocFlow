@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     port: int = 8000
     database_url: str = Field(
         default="sqlite:///./docflow.db",
-        validation_alias=AliasChoices("DOCFLOW_DATABASE_URL", "DATABASE_URL"),
+        validation_alias=AliasChoices("DOCFLOW_DATABASE_URL"),
     )
 
     # SMTP / E-mail
@@ -65,7 +65,9 @@ class Settings(BaseSettings):
     )
     celery_task_always_eager: bool = Field(
         default=False,
-        validation_alias=AliasChoices("DOCFLOW_CELERY_TASK_ALWAYS_EAGER", "CELERY_TASK_ALWAYS_EAGER"),
+        validation_alias=AliasChoices(
+            "DOCFLOW_CELERY_TASK_ALWAYS_EAGER", "CELERY_TASK_ALWAYS_EAGER"
+        ),
     )
     celery_task_default_queue: str = Field(
         default="io",
@@ -78,6 +80,7 @@ class Settings(BaseSettings):
         env_prefix="DOCFLOW_",
         env_file=".env",
         extra="ignore",
+        populate_by_name=True,
     )
 
 
