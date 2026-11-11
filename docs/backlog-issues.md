@@ -242,8 +242,8 @@ Depende de INF-05.
 
 ### BE-03 · Banco de dados, migrações e multi-tenancy `[M0][backend][feature][M]`
 Depende de DOC-08, DOC-10.
-- [ ] SQLAlchemy 2 + Alembic; migração inicial
-- [ ] Todo registro de negócio com `institution_id`
+- [x] SQLAlchemy 2 + Alembic; migração inicial
+- [x] Todo registro de negócio com `institution_id`
 - [ ] Repositório base que **sempre** filtra por tenant; RLS do Postgres como segunda barreira
 - [ ] Testes provando que o tenant A não lê dados do tenant B (RN-01)
 
