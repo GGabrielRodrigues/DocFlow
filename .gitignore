@@ -23,6 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .pnpm-store/
+!apps/web/src/lib/
+!apps/web/src/lib/**
 
 # --- Python / Backend & Workers (apps/server) ---
 __pycache__/
@@ -35,6 +37,8 @@ develop-eggs/
 eggs/
 .eggs/
 lib/
+!apps/web/src/lib/
+!apps/web/src/lib/**
 lib64/
 parts/
 sdist/
