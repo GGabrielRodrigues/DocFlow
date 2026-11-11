@@ -4,6 +4,7 @@ import type {
   DocumentItem,
   DocumentStatus,
   Institution,
+  MediaItem,
   Store,
   User,
 } from './types'
@@ -388,5 +389,14 @@ export const docflowApi = {
       user.name,
     )
     return { user, existed: exists }
+  },
+
+  uploadMedia(currentUser: User, mediaItem: MediaItem): MediaItem {
+    memoryStore = {
+      ...memoryStore,
+      media: [mediaItem, ...memoryStore.media],
+    }
+    recordAudit(currentUser, 'Mídia enviada', mediaItem.title)
+    return mediaItem
   },
 }

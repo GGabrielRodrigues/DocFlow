@@ -448,9 +448,9 @@ Cobre RF-23. Preenche o modelo DOCX, converte para PDF e salva no storage.
 
 ### FE-02 · Design system e acessibilidade `[M1][frontend][feature][M]`
 Cobre RNF-10, RNF-11.
-- [ ] Componentes base (botão, formulário, tabela, modal, toast, upload)
-- [ ] Contraste, foco por teclado, rótulos ARIA, navegação por leitor de tela (WCAG 2.1 AA)
-- [ ] Layout responsivo
+- [x] Componentes base (botão, formulário, tabela, modal, toast, upload)
+- [x] Contraste, foco por teclado, rótulos ARIA, navegação por leitor de tela (WCAG 2.1 AA)
+- [x] Layout responsivo
 
 ### FE-03 · Cliente de API tipado `[M1][frontend][chore][S]`
 Depende de BE-23. Gerar cliente TS a partir do OpenAPI (`orval`/`openapi-typescript`) e automatizar no CI.

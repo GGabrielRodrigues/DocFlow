@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 
-export type IconName = "grid" | "file" | "plus" | "layers" | "check" | "history" | "building" | "users" | "arrow" | "logout" | "menu" | "close" | "edit" | "search" | "shield" | "spark" | "chevron" | "clock" | "video" | "mic"
+export type IconName = "grid" | "file" | "plus" | "layers" | "check" | "history" | "building" | "users" | "arrow" | "logout" | "menu" | "close" | "edit" | "search" | "shield" | "spark" | "chevron" | "clock" | "video" | "mic" | "upload"
 
 const iconPaths: Record<IconName, ReactNode> = {
   grid: (
@@ -114,6 +114,13 @@ const iconPaths: Record<IconName, ReactNode> = {
       <path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8" />
     </>
   ),
+  upload: (
+    <>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <path d="m17 8-5-5-5 5" />
+      <path d="M12 3v12" />
+    </>
+  ),
 }
 
 export interface IconProps {
@@ -125,6 +132,7 @@ export function Icon({ name, size = 19 }: IconProps) {
   return (
     <svg
       aria-hidden="true"
+      focusable="false"
       width={size}
       height={size}
       viewBox="0 0 24 24"

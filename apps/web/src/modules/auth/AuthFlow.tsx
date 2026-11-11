@@ -1,12 +1,23 @@
 import { FormEvent, useState } from "react"
 import { Icon } from "@/components/Icon"
-import { Brand, Button, Field, SelectField } from "@/components/ui"
+import { Brand, Button, Field, SelectField, SkipLink } from "@/components/ui"
 import type {
   AuthView,
   CreateUserWithPasswordInput,
   Institution,
   Store,
 } from "@/lib/types"
+
+export interface AuthFlowProps {
+  view: AuthView
+  setView: (view: AuthView) => void
+  store: Store
+  login: (email: string, password: string) => boolean
+  demoLogin: () => void
+  pendingInstitutionId: string | null
+  onInstitutionCreated: (institution: Institution) => void
+  onAdminCreated: (user: CreateUserWithPasswordInput) => void
+}
 
 export function AuthFlow({
   view,
@@ -17,19 +28,11 @@ export function AuthFlow({
   pendingInstitutionId,
   onInstitutionCreated,
   onAdminCreated,
-}: {
-  view: AuthView
-  setView: (view: AuthView) => void
-  store: Store
-  login: (email: string, password: string) => boolean
-  demoLogin: () => void
-  pendingInstitutionId: string | null
-  onInstitutionCreated: (institution: Institution) => void
-  onAdminCreated: (user: CreateUserWithPasswordInput) => void
-}) {
+}: AuthFlowProps) {
   return (
     <div className="auth">
-      <section className="auth__story">
+      <SkipLink targetId="main-content" />
+      <section className="auth__story" aria-label="Apresentação do DocFlow">
         <Brand light />
         <div className="auth__story-content">
           <span className="eyebrow eyebrow--light">
@@ -62,7 +65,7 @@ export function AuthFlow({
           Ambiente de demonstração · Dados em memória (sem senhas armazenadas)
         </small>
       </section>
-      <section className="auth__panel">
+      <main id="main-content" className="auth__panel" tabIndex={-1}>
         <div className="auth__mobile-brand">
           <Brand />
         </div>
@@ -86,18 +89,17 @@ export function AuthFlow({
             submit={onAdminCreated}
           />
         )}
-      </section>
+      </main>
     </div>
   )
 }
 
-function Welcome({
-  setView,
-  demoLogin,
-}: {
+interface WelcomeProps {
   setView: (view: AuthView) => void
   demoLogin: () => void
-}) {
+}
+
+function Welcome({ setView, demoLogin }: WelcomeProps) {
   return (
     <div className="auth-card">
       <span className="eyebrow">BEM-VINDO AO DOCFLOW</span>
@@ -108,10 +110,11 @@ function Welcome({
       </p>
       <div className="choice-list">
         <button
+          type="button"
           className="choice-card choice-card--primary"
           onClick={() => setView("login")}
         >
-          <span className="choice-card__icon">
+          <span className="choice-card__icon" aria-hidden="true">
             <Icon name="arrow" />
           </span>
           <span>
@@ -120,8 +123,12 @@ function Welcome({
           </span>
           <Icon name="chevron" />
         </button>
-        <button className="choice-card" onClick={() => setView("institution")}>
-          <span className="choice-card__icon">
+        <button
+          type="button"
+          className="choice-card"
+          onClick={() => setView("institution")}
+        >
+          <span className="choice-card__icon" aria-hidden="true">
             <Icon name="building" />
           </span>
           <span>
@@ -136,10 +143,14 @@ function Welcome({
   )
 }
 
-function DemoAccess({ onClick }: { onClick: () => void }) {
+interface DemoAccessProps {
+  onClick: () => void
+}
+
+function DemoAccess({ onClick }: DemoAccessProps) {
   return (
     <div className="demo-box">
-      <span className="demo-box__icon">
+      <span className="demo-box__icon" aria-hidden="true">
         <Icon name="spark" size={18} />
       </span>
       <span>
@@ -153,15 +164,13 @@ function DemoAccess({ onClick }: { onClick: () => void }) {
   )
 }
 
-function Login({
-  setView,
-  login,
-  demoLogin,
-}: {
+interface LoginProps {
   setView: (view: AuthView) => void
   login: (email: string, password: string) => boolean
   demoLogin: () => void
-}) {
+}
+
+function Login({ setView, login, demoLogin }: LoginProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -177,14 +186,22 @@ function Login({
 
   return (
     <div className="auth-card">
-      <button className="back-link" onClick={() => setView("welcome")}>
+      <button
+        type="button"
+        className="back-link"
+        onClick={() => setView("welcome")}
+      >
         ← Voltar
       </button>
       <span className="eyebrow">ACESSO À CONTA</span>
       <h2>Entre para continuar</h2>
       <p className="muted">Use as credenciais vinculadas à sua instituição.</p>
       <form className="form-stack" onSubmit={submit}>
-        {error && <div className="form-alert">{error}</div>}
+        {error && (
+          <div className="form-alert" role="alert">
+            {error}
+          </div>
+        )}
         <Field
           label="E-mail"
           type="email"
@@ -213,7 +230,7 @@ function Login({
       </form>
       <p className="auth-switch">
         Ainda não tem uma conta?{" "}
-        <button onClick={() => setView("institution")}>
+        <button type="button" onClick={() => setView("institution")}>
           Cadastre sua instituição
         </button>
       </p>
@@ -222,15 +239,13 @@ function Login({
   )
 }
 
-function InstitutionSignup({
-  store,
-  setView,
-  submit,
-}: {
+interface InstitutionSignupProps {
   store: Store
   setView: (view: AuthView) => void
   submit: (institution: Institution) => void
-}) {
+}
+
+function InstitutionSignup({ store, setView, submit }: InstitutionSignupProps) {
   const [form, setForm] = useState({
     name: "",
     type: "Escola" as Institution["type"],
@@ -267,12 +282,16 @@ function InstitutionSignup({
 
   return (
     <div className="auth-card auth-card--wide">
-      <button className="back-link" onClick={() => setView("welcome")}>
+      <button
+        type="button"
+        className="back-link"
+        onClick={() => setView("welcome")}
+      >
         ← Voltar
       </button>
-      <div className="step">
+      <div className="step" aria-label="Etapa 1 de 2: Instituição">
         <span className="step__active">1</span>
-        <i />
+        <i aria-hidden="true" />
         <span>2</span>
         <small>Instituição</small>
         <small>Administrador</small>
@@ -351,15 +370,17 @@ function InstitutionSignup({
   )
 }
 
+interface FirstUserSignupProps {
+  store: Store
+  institutionId: string
+  submit: (user: CreateUserWithPasswordInput) => void
+}
+
 function FirstUserSignup({
   store,
   institutionId,
   submit,
-}: {
-  store: Store
-  institutionId: string
-  submit: (user: CreateUserWithPasswordInput) => void
-}) {
+}: FirstUserSignupProps) {
   const institution = store.institutions.find(
     (item) => item.id === institutionId,
   )
@@ -404,9 +425,9 @@ function FirstUserSignup({
 
   return (
     <div className="auth-card auth-card--wide">
-      <div className="step">
+      <div className="step" aria-label="Etapa 2 de 2: Administrador">
         <span>✓</span>
-        <i />
+        <i aria-hidden="true" />
         <span className="step__active">2</span>
         <small>Instituição</small>
         <small>Administrador</small>
