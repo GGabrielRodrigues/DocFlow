@@ -14,10 +14,10 @@ module "apps_env" {
   source = "./modules/env_base"
 
   # Web (apps/web/Dockerfile)
-  web_image_tag = data.infisical_secrets.apps_secrets.secrets["web_image_tag"].value
+  web_image_tag = var.web_image_tag != "" ? var.web_image_tag : data.infisical_secrets.apps_secrets.secrets["web_image_tag"].value
 
   # Server (apps/server/Dockerfile -> API + Workers Celery)
-  server_image_tag       = data.infisical_secrets.apps_secrets.secrets["server_image_tag"].value
+  server_image_tag       = var.server_image_tag != "" ? var.server_image_tag : data.infisical_secrets.apps_secrets.secrets["server_image_tag"].value
   jwt_secret_key         = data.infisical_secrets.apps_secrets.secrets["jwt_secret_key"].value
   cors_allowed_origins   = data.infisical_secrets.apps_secrets.secrets["cors_allowed_origins"].value
   transcription_provider = data.infisical_secrets.apps_secrets.secrets["transcription_provider"].value

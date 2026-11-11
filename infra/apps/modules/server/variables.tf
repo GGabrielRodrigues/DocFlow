@@ -7,7 +7,7 @@ variable "image_registry" {
 variable "image_name" {
   type        = string
   description = "Nome da imagem Docker única do servidor (apps/server/Dockerfile)"
-  default     = "docflow/docflow-server"
+  default     = "ggabrielrodrigues/docflow-server"
 }
 
 variable "image_tag" {

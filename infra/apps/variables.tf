@@ -21,3 +21,15 @@ variable "docker_host" {
   description = "Host do daemon Docker. Se vazio, utiliza o valor docker_ssh_host do Infisical"
   default     = ""
 }
+
+variable "web_image_tag" {
+  type        = string
+  description = "Override opcional da tag da imagem Docker do frontend (apps/web) via CI/CD. Se vazio, utiliza o valor do Infisical."
+  default     = ""
+}
+
+variable "server_image_tag" {
+  type        = string
+  description = "Override opcional da tag da imagem Docker do backend (apps/server) via CI/CD. Se vazio, utiliza o valor do Infisical."
+  default     = ""
+}

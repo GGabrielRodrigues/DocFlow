@@ -7,7 +7,7 @@ variable "image_registry" {
 variable "image_name" {
   type        = string
   description = "Nome da imagem Docker do frontend (apps/web/Dockerfile)"
-  default     = "docflow/docflow-web"
+  default     = "ggabrielrodrigues/docflow-web"
 }
 
 variable "image_tag" {
@@ -19,7 +19,7 @@ variable "image_tag" {
 variable "web_external_port" {
   type        = number
   description = "Porta externa mapeada para o frontend web"
-  default     = 8080
+  default     = 80
 }
 
 variable "network_name" {

@@ -180,10 +180,9 @@ Depende de INF-02.
 
 ### INF-14 · Pipeline CI/CD de deploy da aplicação `[M1][infra][chore][L]`
 Depende de INF-12.
-- [ ] Build e push de imagens por commit (tags imutáveis por SHA)
-- [ ] Deploy automático em staging após merge na `main`; prod por aprovação manual
-- [ ] Deploy por SSH/Compose pull com `infisical run`; rollback para a tag anterior em um comando
-- [ ] Notificação de sucesso/falha
+- [x] Workflows `.github/workflows/deploy-web.yml` e `.github/workflows/deploy-server.yml` criados com build e push de imagens para o GHCR (`ghcr.io/ggabrielrodrigues/docflow-web` e `docflow-server`) com tags imutáveis por SHA (`${GITHUB_SHA::7}`)
+- [x] Deploy automatizado via runner `self-hosted` executando `terraform apply -auto-approve` em `infra/apps` com `-target` por módulo e `TF_VAR_docker_host="unix:///var/run/docker.sock"`
+- [x] Rollback imediato para qualquer tag anterior via `terraform apply -var="web_image_tag=<sha>"` ou `workflow_dispatch`
 
 ### INF-15 · Observabilidade `[M4][infra][feature][L]`
 - [ ] Logs estruturados centralizados (Loki/Grafana ou serviço gerenciado)
