@@ -53,8 +53,8 @@ Mover o protótipo atual para `apps/web`, criar `apps/server`, `infra`, `docs`, 
 - [x] Descrever o fluxo de estado remoto e o inventário completo de variáveis/segredos no Infisical (`infra/variaveis-e-segredos.md` e `infra/AGENTS.md`)
 - [x] Listar providers Terraform usados: `kreuzwerker/docker` (`~> 3.0.1`) e `infisical/infisical` (`~> 0.16.0`)
 
-### DOC-08 · ADR-006: Multi-tenancy (coluna `institution_id` + isolamento) `[M0][docs][S]`
-Decidir entre coluna discriminadora, RLS do Postgres ou schema por tenant. Recomendado: coluna + RLS como defesa em profundidade.
+### DOC-08 · Estratégia de Multi-tenancy (`apps/server/multi-tenancy.md`: coluna `institution_id` + RLS) `[M0][docs][S]`
+- [x] Decisão documentada em `apps/server/multi-tenancy.md`: tabela compartilhada com coluna `institution_id` obrigatória + Row-Level Security (RLS) do PostgreSQL como defesa em profundidade e isolamento por prefixo no Silo (S3)
 
 ### DOC-09 · ADR-007: Estratégia de upload de 10 GB (multipart direto no S3) `[M0][docs][S]`
 

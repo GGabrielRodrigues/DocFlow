@@ -2,6 +2,9 @@
 
 Backend do **DocFlow** em **Python 3.12+**, estruturado como um **Monolito Modular** que reúne a **API HTTP (FastAPI)** e os **Workers assíncronos (Celery)** no mesmo código-base.
 
+> **Documentação Complementar em `apps/server/`:**
+> - [`apps/server/multi-tenancy.md`](./multi-tenancy.md) — Estratégia de isolamento multi-tenant (`institution_id` + PostgreSQL RLS + prefixos no Silo/S3).
+
 ---
 
 ## 1. Por que Monolito Modular com API e Workers Juntos?
