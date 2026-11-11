@@ -6,7 +6,7 @@ Este documento define a organização do **Infisical** nas 4 pastas corresponden
 
 ## 1. Contrato Estrito de `variables.tf` nos Root Modules
 
-Seguindo o padrão herdado do `agentrh-infra`, os arquivos `variables.tf` dos **Root Modules** (`<dominio>/development/variables.tf` e `<dominio>/production/variables.tf`) devem conter **exclusivamente** as variáveis de autenticação no Infisical e a variável opcional de override do socket Docker:
+Os arquivos `variables.tf` dos **Root Modules** (`<dominio>/variables.tf`) devem conter **exclusivamente** as variáveis de autenticação no Infisical e a variável opcional de override do socket Docker:
 
 ```hcl
 # Infisical Universal Auth
@@ -36,7 +36,7 @@ variable "docker_host" {
 ```
 
 ### Template `terraform.tfvars.example`
-Em cada pasta `development/` e `production/`, o arquivo `terraform.tfvars.example` versionado contém apenas o esqueleto sem valores:
+Em cada domínio (`infra/<dominio>/`), o arquivo `terraform.tfvars.example` versionado contém apenas o esqueleto sem valores:
 
 ```hcl
 infisical_client_id     = ""
@@ -46,16 +46,12 @@ infisical_workspace_id  = ""
 
 ---
 
-## 2. Estrutura de Ambientes e Pastas no Infisical
+## 2. Estrutura de Pastas no Infisical
 
-No projeto **DocFlow** dentro do Infisical, utilizamos os ambientes:
-- `dev` (consumido pelos diretórios `<dominio>/development`)
-- `prod` (consumido pelos diretórios `<dominio>/production`)
-
-Dentro de cada ambiente, os segredos são divididos em **4 pastas temáticas** que espelham exatamente os 4 domínios de `infra/`:
+No projeto **DocFlow** dentro do Infisical (`env_slug = "prod"`), os segredos são divididos em **4 pastas temáticas** que espelham exatamente os 4 domínios de `infra/`:
 
 ```text
-Infisical Project: DocFlow (ambientes: dev | prod)
+Infisical Project: DocFlow (env_slug: prod)
 ├── /databases       # Postgres, Redis, Silo (S3) + conectividade Docker/GHCR
 ├── /apps            # Aplicações próprias: docflow-web e docflow-server (API + Workers + IA)
 ├── /tools           # Ferramentas: pgAdmin e Portainer
@@ -67,13 +63,13 @@ Cada Root Module lê a pasta do seu próprio domínio e, quando precisa de crede
 
 ```hcl
 data "infisical_secrets" "databases_secrets" {
-  env_slug     = "dev" # ou "prod"
+  env_slug     = "prod"
   workspace_id = var.infisical_workspace_id
   folder_path  = "/databases"
 }
 
 data "infisical_secrets" "apps_secrets" {
-  env_slug     = "dev" # ou "prod"
+  env_slug     = "prod"
   workspace_id = var.infisical_workspace_id
   folder_path  = "/apps"
 }

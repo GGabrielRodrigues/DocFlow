@@ -1,0 +1,14 @@
+apiVersion: 1
+
+providers:
+  - name: DocFlow
+    orgId: 1
+    folder: DocFlow
+    folderUid: docflow
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: false

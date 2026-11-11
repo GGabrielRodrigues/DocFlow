@@ -27,14 +27,14 @@ Este documento define as regras arquiteturais e convenções obrigatórias para 
 
 ## 2. Regras Estritas de Desenvolvimento
 
-### 2.1. Segredos e `variables.tf` dos Ambientes
+### 2.1. Segredos e `variables.tf` dos Domínios
 1. **NUNCA escreva senhas, chaves de API, tokens ou endpoints sensíveis em código `.tf` ou em arquivos versionados.**
-2. O arquivo `<dominio>/<ambiente>/variables.tf` deve conter **APENAS**:
+2. O arquivo `<dominio>/variables.tf` deve conter **APENAS**:
    - `infisical_client_id` (`sensitive = true`)
    - `infisical_client_secret` (`sensitive = true`)
    - `infisical_workspace_id`
    - `docker_host` (`default = ""`)
-3. Todas as demais variáveis do domínio devem ser lidas via `data "infisical_secrets"` no `<dominio>/<ambiente>/main.tf` e repassadas para o módulo `../modules/env_base`.
+3. Todas as demais variáveis do domínio devem ser lidas via `data "infisical_secrets"` no `<dominio>/main.tf` e repassadas para o módulo `./modules/env_base`.
 
 ### 2.2. Padrão de 3 Camadas por Domínio
 Todo domínio (`databases`, `apps`, `tools`, `observability`) segue obrigatoriamente a estrutura:
@@ -43,8 +43,8 @@ Todo domínio (`databases`, `apps`, `tools`, `observability`) segue obrigatoriam
    - Se precisar injetar arquivos de configuração, coloca o template em `files/` e usa o bloco `upload` com `file()` ou `templatefile()`.
 2. **Orquestrador do Domínio (`<dominio>/modules/env_base`)**:
    - Instancia os módulos atômicos do domínio e os conecta à rede `shared-network` (criada como `resource "docker_network" "shared"` em `databases/modules/env_base` e lida via `data "docker_network" "shared"` nos demais domínios).
-3. **Root Module de Ambiente (`<dominio>/development` e `<dominio>/production`)**:
-   - Configura o bloco `cloud` do HCP Terraform, os providers `docker` e `infisical`, os `data "infisical_secrets"` e instancia `module "<dominio>_env" { source = "../modules/env_base" ... }`.
+3. **Root Module do Domínio (`<dominio>/`)**:
+   - Configura o bloco `cloud` do HCP Terraform, os providers `docker` e `infisical`, os `data "infisical_secrets"` e instancia `module "<dominio>_env" { source = "./modules/env_base" ... }`.
 
 ### 2.3. Validação Obrigatória
 Após qualquer alteração em arquivos `.tf`, execute em `infra/`:

@@ -92,19 +92,18 @@ Anonimizados, para uso como modelos padrão e conjunto de avaliação da IA.
 > Regras gerais: nenhum segredo no repositório nem em arquivo `.tfvars` versionado; estado **somente** no HCP Terraform; variáveis de ambiente das aplicações **somente** via Infisical.
 
 ### INF-01 · Criar organização e projeto no HCP Terraform `[M0][infra][chore][S]`
-- [ ] Organização, projeto e workspaces `docflow-staging` e `docflow-prod`
-- [ ] Execution mode **Agent** (o agent roda no servidor on-premise, ver INF-19); alternativa documentada: modo local com estado remoto
-- [ ] Pool de agents criado e token do agent guardado no Infisical
-- [ ] Membros do time convidados com permissões adequadas
-- [ ] Token de API guardado de forma segura (não no repo)
+- [x] Organização `DocFlow`, projeto e os 4 workspaces por domínio (`databases`, `apps`, `tools`, `observability`) criados
+- [x] Execution mode **Local** com **CLI-driven workflow** e estado remoto no HCP Terraform (dispensa pool de agents / `INF-19`)
+- [x] Membros do time convidados com permissões adequadas (se aplicável)
+- [x] Token de API do HCP Terraform gerado (`terraform login`) e guardado fora do repositório
 
 ### INF-02 · Estrutura Terraform base com backend `cloud` `[M0][infra][chore][M]`
 Depende de INF-01.
-- [ ] `infra/terraform/` com módulos (`network`, `compute`, `storage`, `dns`) e ambientes (`staging`, `prod`)
-- [ ] Bloco `terraform { cloud { ... } }` apontando ao workspace correto
-- [ ] Versão do Terraform e providers fixadas; `.terraform.lock.hcl` versionado
-- [ ] `terraform init` funciona e o `.tfstate` **não** existe localmente
-- [ ] `.gitignore` bloqueando `*.tfstate*`, `*.tfvars` com segredos, `.terraform/`
+- [x] `infra/` estruturado nos 4 domínios (`databases`, `apps`, `tools`, `observability`) em 3 camadas (`Root Module` -> `modules/env_base` -> `modules/<servico>`)
+- [x] Bloco `terraform { cloud { ... } }` apontando ao workspace correto na organização `DocFlow` (`databases`, `apps`, `tools`, `observability`)
+- [x] Versão do Terraform (`>= 1.8.0`) e providers (`kreuzwerker/docker ~> 3.0.1`, `infisical/infisical ~> 0.16.0`) fixadas; `.terraform.lock.hcl` gerado e versionado nos 4 domínios
+- [x] `terraform init` e `terraform validate` validados nos 4 domínios e o `.tfstate` **não** existe localmente
+- [x] `.gitignore` bloqueando `*.tfstate*`, `*.tfvars` com segredos, `.terraform/`
 
 ### INF-03 · Configurar Infisical (projeto, ambientes e pastas) `[M0][infra][security][S]`
 - [ ] Projeto `docflow` com ambientes `dev`, `staging`, `prod`
@@ -217,12 +216,7 @@ Depende de INF-12.
 - [ ] Planilha de custo mensal (energia, internet, backup externo, transcrição/h, LLM)
 - [ ] Alertas de orçamento nos provedores de IA
 
-### INF-19 · Instalar HCP Terraform Agent no servidor `[M0][infra][feature][M]`
-Depende de INF-01, INF-05.
-- [ ] Agent rodando como serviço (container ou systemd) com token do pool, reinício automático e saída apenas (outbound HTTPS, sem porta de entrada)
-- [ ] Workspaces `docflow-staging` e `docflow-prod` configurados para executar no pool de agents
-- [ ] Teste de `plan` e `apply` de ponta a ponta com um recurso trivial
-- [ ] Token do agent e procedimento de rotação documentados
+### ~~INF-19 · Instalar HCP Terraform Agent no servidor `[M0][infra][feature][M]`~~ *(Descartada — adotado Execution Mode Local com estado remoto no HCP Terraform na INF-01)*
 
 ### INF-20 · Exposição segura do servidor à internet `[M1][infra][security][M]`
 Depende de INF-05.
