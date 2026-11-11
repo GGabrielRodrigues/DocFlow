@@ -64,8 +64,9 @@ Entidades: Institution, User, Media, Transcript, Speaker, TranscriptSegment, Tem
 - [x] Diagrama ER (Mermaid) e glossário (linguagem ubíqua) em `docs/modelo-dominio.md`
 - [x] Máquina de estados de Document, Media e Job em `docs/modelo-dominio.md`
 
-### DOC-11 · Contrato inicial da API (OpenAPI) `[M0][docs][M]`
-Depende de DOC-10. Esboço de endpoints por contexto, convenções de erro (RFC 9457), paginação e autenticação.
+### DOC-11 · Contrato inicial da API (`contracts/README.md` — OpenAPI) `[M0][docs][M]`
+Depende de DOC-10.
+- [x] Esboço completo de endpoints por contexto (`/api/v1/...`), convenções de erro (RFC 9457), paginação e autenticação documentados em `contracts/README.md`
 
 ### DOC-12 · Política de privacidade e LGPD do produto `[M4][docs][M]`
 - [ ] Mapeamento de dados pessoais tratados (vídeo, voz, nomes, transcrições)
