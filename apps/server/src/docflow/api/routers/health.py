@@ -36,7 +36,7 @@ async def health(
     settings: Settings = Depends(get_settings),
 ) -> LivenessResponse:
     response.headers["Cache-Control"] = "no-store"
-    return {"status": "ok", "service": settings.app_name}
+    return LivenessResponse(status="ok", service=settings.app_name)
 
 
 @router.get(
@@ -56,8 +56,8 @@ async def ready(
         if is_ready
         else status.HTTP_503_SERVICE_UNAVAILABLE
     )
-    return {
-        "status": "ready" if is_ready else "not_ready",
-        "checks": checks,
-        "request_id": request.state.request_id,
-    }
+    return ReadinessResponse(
+        status="ready" if is_ready else "not_ready",
+        checks=checks,
+        request_id=request.state.request_id,
+    )

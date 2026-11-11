@@ -64,7 +64,6 @@ Com `DOCFLOW_DEBUG=true`, a documentação interativa fica disponível em
 
 - `src/docflow/main.py`: criação da aplicação e entrypoint do Uvicorn.
 - `src/docflow/api/router.py`: composição dos routers HTTP da aplicação.
-- `src/docflow/api/dependencies.py`: composição das dependências e serviços usados pelos routers.
 - `src/docflow/api/routers/`: routers HTTP e seus schemas de entrada/saída.
 - `src/docflow/application/`: casos de uso e orquestração.
 - `src/docflow/domain/`: tipos e regras puras do domínio.

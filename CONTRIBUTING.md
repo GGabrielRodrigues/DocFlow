@@ -124,3 +124,30 @@ Refs: BE-04, RF-01, RN-02
   - Desenvolvimento orientado a testes (**TDD**) para regras de negócio na camada `domain`.
   - Nenhum módulo de `domain` pode importar de `infrastructure` ou `api`.
   - Todo acesso a dados de negócio deve respeitar o isolamento multi-tenant (`institution_id`).
+
+### 5.1. Guia de TDD no domínio
+
+Para cada regra de negócio, siga o ciclo Red-Green-Refactor:
+
+1. **Red:** escreva primeiro um teste unitário que descreva uma regra observável e falhe.
+2. **Green:** implemente apenas o necessário para o teste passar.
+3. **Refactor:** melhore nomes, estrutura e duplicação mantendo todos os testes verdes.
+
+Os testes do domínio devem ser independentes de FastAPI, banco de dados, rede e
+infraestrutura. Use `pytest` para casos determinísticos, `pytest-asyncio` para
+casos assíncronos e `hypothesis` para invariantes que precisam ser verificadas
+em várias entradas. A cobertura mínima configurada para `docflow.domain` é
+80% do código Python implementado; quando os módulos de domínio forem
+introduzidos, eles devem manter essa mesma exigência. Cobertura não substitui
+testes de regras e casos-limite.
+
+Comandos locais do backend:
+
+```powershell
+cd apps/server
+poetry install
+poetry run pytest --cov=docflow --cov-report=term-missing
+poetry run ruff check src tests
+poetry run mypy src
+poetry run lint-imports
+```

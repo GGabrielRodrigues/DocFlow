@@ -1,0 +1,56 @@
+name: Server Quality
+
+on:
+  pull_request:
+    paths:
+      - "apps/server/**"
+      - ".pre-commit-config.yaml"
+      - ".github/workflows/server-quality.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/server/**"
+      - ".pre-commit-config.yaml"
+      - ".github/workflows/server-quality.yml"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: apps/server
+
+jobs:
+  quality:
+    name: Python quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: poetry
+          cache-dependency-path: apps/server/poetry.lock
+
+      - name: Install Poetry
+        run: pipx install poetry
+        working-directory: .
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Ruff
+        run: poetry run ruff check src tests
+
+      - name: Mypy
+        run: poetry run mypy src
+
+      - name: Import linter
+        run: poetry run lint-imports
+
+      - name: Tests and coverage
+        run: poetry run pytest --cov=docflow --cov-report=term-missing
