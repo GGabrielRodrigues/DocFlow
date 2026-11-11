@@ -3,7 +3,7 @@ data "docker_network" "shared" {
 }
 
 resource "docker_image" "portainer" {
-  name         = "portainer/portainer-ee:latest"
+  name         = "portainer/portainer-ce:latest"
   keep_locally = true
 }
 
