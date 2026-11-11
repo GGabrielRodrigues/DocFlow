@@ -1,0 +1,23 @@
+{% extends "base.txt" %}
+
+{% block content %}
+Olá, {{ recipient_name }}!
+
+Um novo documento foi submetido e aguarda a sua revisão e validação no DocFlow.
+
+Detalhes:
+- Documento: {{ document_title }}
+{% if document_type %}
+- Tipo: {{ document_type }}
+{% endif %}
+- Solicitante: {{ requester_name }}
+{% if document_id %}
+- ID: {{ document_id }}
+{% endif %}
+{% if due_date %}
+- Prazo sugerido: {{ due_date }}
+{% endif %}
+
+Para revisar e aprovar o documento, acesse:
+{{ validation_url }}
+{% endblock %}

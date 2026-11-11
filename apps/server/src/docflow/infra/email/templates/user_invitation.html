@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Convite para o DocFlow — {{ institution_name }}{% endblock %}
+
+{% block content %}
+<h2>Olá, {{ user_name }}!</h2>
+
+<p>Você foi convidado(a) para fazer parte da instituição <strong>{{ institution_name }}</strong> no <strong>DocFlow</strong> com o perfil de <strong>{{ role | default("Funcionário") }}</strong>.</p>
+
+<p>Para ativar o seu acesso e definir a sua senha com segurança, clique no botão abaixo:</p>
+
+<div style="text-align: center;">
+  <a href="{{ invite_url }}" class="btn">Aceitar Convite e Definir Senha</a>
+</div>
+
+<p class="fallback-url">
+  Se o botão não funcionar, copie e cole o seguinte link no seu navegador:<br>
+  <a href="{{ invite_url }}">{{ invite_url }}</a>
+</p>
+
+<div class="highlight-box">
+  <small><strong>Atenção:</strong> Por motivos de segurança, este convite expira em <strong>{{ expires_in_hours | default(48) }} horas</strong>.</small>
+</div>
+
+<p>Se você não esperava por este convite, por favor desconsidere esta mensagem.</p>
+{% endblock %}

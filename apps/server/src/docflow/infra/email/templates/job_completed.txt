@@ -1,0 +1,27 @@
+{% extends "base.txt" %}
+
+{% block content %}
+Olá, {{ recipient_name }}!
+
+{% if is_success | default(true) %}
+O processamento da sua solicitação no DocFlow foi finalizado com sucesso!
+{% else %}
+Houve uma ocorrência durante o processamento da sua solicitação no DocFlow.
+{% endif %}
+
+Detalhes:
+- Tarefa: {{ job_title }}
+- Tipo: {{ job_type | default("Processamento de Mídia/Documento") }}
+- Status: {{ status | default("Concluído") }}
+{% if duration %}
+- Tempo decorrido: {{ duration }}
+{% endif %}
+{% if error_message %}
+- Detalhes do erro: {{ error_message }}
+{% endif %}
+{% if result_url %}
+
+Para visualizar o resultado, acesse o link:
+{{ result_url }}
+{% endif %}
+{% endblock %}
