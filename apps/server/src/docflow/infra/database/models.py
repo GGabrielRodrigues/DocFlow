@@ -58,3 +58,22 @@ class UserModel(TenantScopedMixin, Base):
         default=datetime.utcnow,
         nullable=False,
     )
+
+
+class MediaModel(TenantScopedMixin, Base):
+    __tablename__ = "media"
+
+    id: Mapped[Id] = mapped_column(default=lambda: str(uuid4()))
+    original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    size_bytes: Mapped[int] = mapped_column(nullable=False)
+    declared_duration_seconds: Mapped[int] = mapped_column(nullable=False)
+    storage_bucket: Mapped[str] = mapped_column(String(63), nullable=False)
+    storage_key: Mapped[str] = mapped_column(String(1024), nullable=False)
+    multipart_upload_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        nullable=False,
+    )

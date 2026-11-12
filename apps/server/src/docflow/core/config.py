@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
     database_url: str = "sqlite:///./docflow.db"
+    storage_endpoint: str | None = None
+    storage_access_key: str | None = None
+    storage_secret_key: str | None = None
+    storage_region: str = "us-east-1"
+    storage_bucket_media_raw: str = "media-raw"
 
     model_config = SettingsConfigDict(
         env_prefix="DOCFLOW_",
