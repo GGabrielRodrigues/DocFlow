@@ -76,6 +76,35 @@ class Settings(BaseSettings):
         ),
     )
 
+    # JWT / Auth
+    jwt_secret_key: str = Field(
+        default="dev-only-jwt-secret-key-change-in-production-0123456789abcdef",
+        validation_alias=AliasChoices("DOCFLOW_JWT_SECRET_KEY", "JWT_SECRET_KEY"),
+    )
+    jwt_algorithm: str = Field(
+        default="HS256",
+        validation_alias=AliasChoices("DOCFLOW_JWT_ALGORITHM", "JWT_ALGORITHM"),
+    )
+    jwt_access_token_expire_minutes: int = Field(
+        default=15,
+        validation_alias=AliasChoices(
+            "DOCFLOW_JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "JWT_ACCESS_TOKEN_EXPIRE_MINUTES"
+        ),
+    )
+    jwt_refresh_token_expire_days: int = Field(
+        default=7,
+        validation_alias=AliasChoices(
+            "DOCFLOW_JWT_REFRESH_TOKEN_EXPIRE_DAYS", "JWT_REFRESH_TOKEN_EXPIRE_DAYS"
+        ),
+    )
+    password_reset_token_expire_minutes: int = Field(
+        default=60,
+        validation_alias=AliasChoices(
+            "DOCFLOW_PASSWORD_RESET_TOKEN_EXPIRE_MINUTES",
+            "PASSWORD_RESET_TOKEN_EXPIRE_MINUTES",
+        ),
+    )
+
     model_config = SettingsConfigDict(
         env_prefix="DOCFLOW_",
         env_file=".env",

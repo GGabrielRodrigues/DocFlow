@@ -31,6 +31,7 @@ pre-commit = ">=3.8,<5.0"
 [tool.poetry.scripts]
 docflow-api = "docflow.main:run"
 docflow-worker = "docflow.worker:main"
+docflow-openapi = "docflow.cli.openapi:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0"]

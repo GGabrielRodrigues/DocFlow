@@ -254,10 +254,10 @@ Cobre RF-01, RN-02.
 
 ### BE-05 · Autenticação e sessão `[M1][backend][security][L]`
 Cobre RF-02, RNF-05, RN-04.
-- [ ] Login com e-mail/senha (Argon2), JWT de acesso curto + refresh com rotação
-- [ ] Logout, recuperação e troca de senha por e-mail com token de uso único
-- [ ] Rate limiting e bloqueio temporário contra força bruta
-- [ ] Usuário inativo não autentica
+- [x] Login com e-mail/senha (Argon2), JWT de acesso curto + refresh com rotação
+- [x] Logout, recuperação e troca de senha por e-mail com token de uso único
+- [x] Rate limiting e bloqueio temporário contra força bruta
+- [x] Usuário inativo não autentica
 - [ ] MFA (TOTP) como item opcional separado
 
 ### BE-06 · Gestão de usuários e autorização (RBAC) `[M1][backend][feature][M]`
@@ -365,7 +365,7 @@ Cobre RF-30, RF-31, RN-14, RN-15, RNF-07.
 - [ ] `pip-audit` e análise estática (bandit) no CI
 
 ### BE-23 · Geração do contrato OpenAPI para o front `[M1][backend][chore][S]`
-- [ ] Publicar `openapi.json` em `contracts/` a cada mudança; falhar o CI se estiver desatualizado
+- [x] Publicar `openapi.json` em `contracts/` a cada mudança; falhar o CI se estiver desatualizado
 
 ### BE-24 · Notificações por e-mail `[M1][backend][feature][M]`
 - [x] Porta `EmailSender` com adaptador SMTP (`aiosmtplib` e `smtplib`) e `FakeEmailSender` em memória

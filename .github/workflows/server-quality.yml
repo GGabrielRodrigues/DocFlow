@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "apps/server/**"
+      - "contracts/**"
       - ".pre-commit-config.yaml"
       - ".github/workflows/server-quality.yml"
   push:
@@ -11,6 +12,7 @@ on:
       - main
     paths:
       - "apps/server/**"
+      - "contracts/**"
       - ".pre-commit-config.yaml"
       - ".github/workflows/server-quality.yml"
 
@@ -51,6 +53,9 @@ jobs:
 
       - name: Import linter
         run: poetry run lint-imports
+
+      - name: Verify OpenAPI Schema Sync
+        run: poetry run docflow-openapi --check
 
       - name: Tests and coverage
         run: poetry run pytest --cov=docflow --cov-report=term-missing
