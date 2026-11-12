@@ -15,4 +15,4 @@ Diretório responsável por armazenar os contratos compartilhados entre o **Back
 1. **Exportação pelo Backend (`apps/server`):**
    O FastAPI gera automaticamente a especificação OpenAPI 3.1 no arquivo `contracts/openapi.json` (validado em CI para garantir que nunca fique desatualizado em relação ao código Python).
 2. **Geração de Cliente Tipado no Frontend (`apps/web`):**
-   O frontend consome `contracts/openapi.json` via `openapi-typescript` / `orval` para gerar os tipos TypeScript e os *hooks* de requisição, garantindo sincronia de tipos de ponta a ponta.
+   O frontend consome `contracts/openapi.json` via `pnpm --dir apps/web run generate:api` (`apps/web/scripts/generate-openapi-client.mjs`) para gerar `apps/web/src/lib/api-schema.gen.ts` e o cliente tipado `apps/web/src/lib/api-client.ts`, validado automaticamente no CI (`pnpm --dir apps/web run generate:api:check` em `.github/workflows/web-quality.yml`).

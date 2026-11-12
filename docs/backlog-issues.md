@@ -456,6 +456,9 @@ Cobre RNF-10, RNF-11.
 
 ### FE-03 · Cliente de API tipado `[M1][frontend][chore][S]`
 Depende de BE-23. Gerar cliente TS a partir do OpenAPI (`orval`/`openapi-typescript`) e automatizar no CI.
+- [x] Gerador determinístico de esquema e tipos OpenAPI 3.1 (`apps/web/scripts/generate-openapi-client.mjs` → `apps/web/src/lib/api-schema.gen.ts`)
+- [x] Cliente HTTP tipado (`apps/web/src/lib/api-client.ts`) integrado ao tratamento RFC 9457 (`http-client.ts`)
+- [x] Verificação automatizada de sincronia do contrato no CI (`generate:api:check` em `.github/workflows/web-quality.yml`)
 
 ### FE-04 · Cadastro de instituição, login e recuperação de senha `[M1][frontend][feature][M]`
 Cobre RF-01, RF-02. Depende de BE-04, BE-05.
