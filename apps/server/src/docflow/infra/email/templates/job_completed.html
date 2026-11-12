@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Processamento Concluído — DocFlow{% endblock %}
+
+{% block content %}
+<h2>Olá, {{ recipient_name }}!</h2>
+
+{% if is_success | default(true) %}
+<p>O processamento da sua solicitação no <strong>DocFlow</strong> foi finalizado com sucesso!</p>
+{% else %}
+<p>Houve uma ocorrência durante o processamento da sua solicitação no <strong>DocFlow</strong>.</p>
+{% endif %}
+
+<div class="highlight-box" style="border-left-color: {% if is_success | default(true) %}#16a34a{% else %}#dc2626{% endif %};">
+  <p style="margin: 0 0 6px 0;"><strong>Tarefa:</strong> {{ job_title }}</p>
+  <p style="margin: 0 0 6px 0;"><strong>Tipo:</strong> {{ job_type | default("Processamento de Mídia/Documento") }}</p>
+  <p style="margin: 0 0 6px 0;"><strong>Status:</strong> <span style="color: {% if is_success | default(true) %}#16a34a{% else %}#dc2626{% endif %}; font-weight: 600;">{{ status | default("Concluído") }}</span></p>
+  {% if duration %}
+  <p style="margin: 0 0 6px 0;"><strong>Tempo decorrido:</strong> {{ duration }}</p>
+  {% endif %}
+  {% if error_message %}
+  <p style="margin: 0; color: #b91c1c;"><strong>Detalhes do erro:</strong> {{ error_message }}</p>
+  {% endif %}
+</div>
+
+{% if result_url %}
+<div style="text-align: center;">
+  <a href="{{ result_url }}" class="btn">Visualizar Resultado</a>
+</div>
+
+<p class="fallback-url">
+  Se o botão não funcionar, copie e cole o seguinte link no seu navegador:<br>
+  <a href="{{ result_url }}">{{ result_url }}</a>
+</p>
+{% endif %}
+{% endblock %}

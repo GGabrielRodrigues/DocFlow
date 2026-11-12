@@ -51,11 +51,7 @@ async def ready(
 ) -> ReadinessResponse:
     checks = _readiness_checks()
     is_ready = all(value == "ok" for value in checks.values())
-    response.status_code = (
-        status.HTTP_200_OK
-        if is_ready
-        else status.HTTP_503_SERVICE_UNAVAILABLE
-    )
+    response.status_code = status.HTTP_200_OK if is_ready else status.HTTP_503_SERVICE_UNAVAILABLE
     return ReadinessResponse(
         status="ready" if is_ready else "not_ready",
         checks=checks,

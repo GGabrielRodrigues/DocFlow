@@ -5,6 +5,7 @@ import type {
   DocumentStatus,
   Institution,
   MediaItem,
+  MediaKind,
   Store,
   User,
 } from './types'
@@ -12,6 +13,15 @@ import type {
 export const DEMO_INSTITUTION = 'inst-demo'
 export const DEMO_ADMIN = 'user-demo-admin'
 export const DEMO_EMPLOYEE = 'user-demo-employee'
+
+export function inferMediaKind(fileName: string, mimeType?: string): MediaKind {
+  if (mimeType?.startsWith('audio/')) return 'Áudio'
+  const lower = fileName.toLowerCase()
+  if (lower.endsWith('.mp3') || lower.endsWith('.wav') || lower.endsWith('.m4a')) {
+    return 'Áudio'
+  }
+  return 'Vídeo'
+}
 
 function createInitialStore(): Store {
   return {
@@ -123,9 +133,12 @@ function createInitialStore(): Store {
         institutionId: DEMO_INSTITUTION,
         title: 'Reunião Pedagógica — Maio',
         fileName: 'reuniao-pedagogica-maio.mp4',
+        kind: 'Vídeo',
+        mimeType: 'video/mp4',
         durationSeconds: 3420,
         sizeBytes: 420 * 1024 * 1024,
         status: 'Transcrito',
+        progressPercent: 100,
         uploadedBy: DEMO_ADMIN,
         createdAt: '2025-05-22T13:00:00.000Z',
       },
@@ -134,11 +147,29 @@ function createInitialStore(): Store {
         institutionId: DEMO_INSTITUTION,
         title: 'Conselho Escolar — Planejamento Semestral',
         fileName: 'conselho-escolar-semestral.mp4',
+        kind: 'Vídeo',
+        mimeType: 'video/mp4',
         durationSeconds: 2715,
         sizeBytes: 310 * 1024 * 1024,
         status: 'Pronto',
+        progressPercent: 100,
         uploadedBy: DEMO_EMPLOYEE,
         createdAt: '2025-05-24T09:10:00.000Z',
+      },
+      {
+        id: 'media-3',
+        institutionId: DEMO_INSTITUTION,
+        title: 'Comissão de Prestação de Contas — Maio',
+        fileName: 'comissao-prestacao-maio.m4a',
+        kind: 'Áudio',
+        mimeType: 'audio/mp4',
+        durationSeconds: 1980,
+        sizeBytes: 64 * 1024 * 1024,
+        status: 'Em processamento',
+        progressPercent: 55,
+        jobId: 'job-media-3',
+        uploadedBy: DEMO_ADMIN,
+        createdAt: '2025-05-25T11:20:00.000Z',
       },
     ],
     transcripts: [
@@ -392,11 +423,132 @@ export const docflowApi = {
   },
 
   uploadMedia(currentUser: User, mediaItem: MediaItem): MediaItem {
+    const enriched: MediaItem = {
+      ...mediaItem,
+      kind: mediaItem.kind || inferMediaKind(mediaItem.fileName, mediaItem.mimeType),
+      progressPercent:
+        mediaItem.progressPercent ??
+        (mediaItem.status === 'Na fila'
+          ? 15
+          : mediaItem.status === 'Em processamento'
+            ? 40
+            : 100),
+      jobId: mediaItem.jobId || `job-${mediaItem.id}`,
+    }
     memoryStore = {
       ...memoryStore,
-      media: [mediaItem, ...memoryStore.media],
+      media: [enriched, ...memoryStore.media],
     }
-    recordAudit(currentUser, 'Mídia enviada', mediaItem.title)
-    return mediaItem
+    recordAudit(currentUser, 'Mídia enviada', enriched.title)
+    return enriched
+  },
+
+  advanceProcessingMedia(institutionId?: string): string[] {
+    const completedTitles: string[] = []
+    let changed = false
+
+    const updatedMedia = memoryStore.media.map((item) => {
+      if (institutionId && item.institutionId !== institutionId) {
+        return item
+      }
+      if (item.status === 'Na fila') {
+        changed = true
+        return {
+          ...item,
+          status: 'Em processamento' as const,
+          progressPercent: Math.max(30, (item.progressPercent ?? 15) + 25),
+        }
+      }
+      if (item.status === 'Em processamento') {
+        changed = true
+        const nextProgress = (item.progressPercent ?? 45) + 30
+        if (nextProgress >= 100) {
+          completedTitles.push(item.title)
+          return {
+            ...item,
+            status: 'Pronto' as const,
+            progressPercent: 100,
+          }
+        }
+        return {
+          ...item,
+          progressPercent: nextProgress,
+        }
+      }
+      return item
+    })
+
+    if (changed) {
+      memoryStore = {
+        ...memoryStore,
+        media: updatedMedia,
+      }
+    }
+
+    return completedTitles
+  },
+
+  cancelMediaJob(currentUser: User, mediaId: string): MediaItem | null {
+    const target = memoryStore.media.find((item) => item.id === mediaId)
+    if (!target) return null
+
+    const updated: MediaItem = {
+      ...target,
+      status: 'Cancelado',
+    }
+    memoryStore = {
+      ...memoryStore,
+      media: memoryStore.media.map((item) => (item.id === mediaId ? updated : item)),
+    }
+    recordAudit(currentUser, 'Processamento cancelado', target.title)
+    return updated
+  },
+
+  retryMediaJob(currentUser: User, mediaId: string): MediaItem | null {
+    const target = memoryStore.media.find((item) => item.id === mediaId)
+    if (!target) return null
+
+    const updated: MediaItem = {
+      ...target,
+      status: 'Na fila',
+      progressPercent: 15,
+      errorMessage: undefined,
+      jobId: `job-${crypto.randomUUID()}`,
+    }
+    memoryStore = {
+      ...memoryStore,
+      media: memoryStore.media.map((item) => (item.id === mediaId ? updated : item)),
+    }
+    recordAudit(currentUser, 'Reprocessamento solicitado', target.title)
+    return updated
+  },
+
+  getSignedMediaUrl(
+    currentUser: User,
+    mediaId: string,
+    purpose: 'preview' | 'download',
+  ): string {
+    const target = memoryStore.media.find((item) => item.id === mediaId)
+    const fileName = target?.fileName || 'midia.mp4'
+    if (purpose === 'download' && target) {
+      recordAudit(currentUser, 'Mídia baixada', target.title)
+    }
+    if (target?.previewUrl) {
+      return target.previewUrl
+    }
+    return `https://docflow-s3.gabrieldevops.dev.br/media-raw/${currentUser.institutionId}/${mediaId}/${encodeURIComponent(fileName)}?X-Amz-Expires=900&purpose=${purpose}`
+  },
+
+  deleteMedia(currentUser: User, mediaId: string): boolean {
+    const target = memoryStore.media.find((item) => item.id === mediaId)
+    if (!target) return false
+
+    memoryStore = {
+      ...memoryStore,
+      media: memoryStore.media.filter((item) => item.id !== mediaId),
+      transcripts: memoryStore.transcripts.filter((tr) => tr.mediaId !== mediaId),
+    }
+    recordAudit(currentUser, 'Mídia excluída', target.title)
+    return true
   },
 }

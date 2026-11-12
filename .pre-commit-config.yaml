@@ -19,6 +19,12 @@ repos:
         language: system
         pass_filenames: false
         files: ^apps/server/src/
+      - id: server-openapi-check
+        name: server openapi check
+        entry: poetry --directory apps/server run docflow-openapi --check
+        language: system
+        pass_filenames: false
+        files: ^(apps/server/src/|contracts/)
       - id: server-tests
         name: server tests
         entry: poetry --directory apps/server run pytest --cov=docflow --cov-report=term-missing

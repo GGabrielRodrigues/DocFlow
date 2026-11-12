@@ -74,7 +74,9 @@ def create_institutions_router(session_factory: sessionmaker[Session]) -> APIRou
             register = RegisterInstitution(repository)
             return _register(payload, register)
 
-    def _register(payload: RegistrationRequest, use_case: RegisterInstitution) -> RegistrationResponse:
+    def _register(
+        payload: RegistrationRequest, use_case: RegisterInstitution
+    ) -> RegistrationResponse:
         try:
             registration = use_case.execute(
                 institution_name=payload.institution.name,

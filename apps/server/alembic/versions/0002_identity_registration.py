@@ -3,19 +3,22 @@
 Revision ID: 0002_identity_registration
 Revises: 0001_initial
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
+from alembic import op
 
 revision: str = "0002_identity_registration"
-down_revision: Union[str, Sequence[str], None] = "0001_initial"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = "0001_initial"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.add_column("institutions", sa.Column("institution_type", sa.String(length=50), nullable=True))
+    op.add_column(
+        "institutions", sa.Column("institution_type", sa.String(length=50), nullable=True)
+    )
     op.add_column("institutions", sa.Column("cnpj", sa.String(length=14), nullable=True))
     op.add_column("institutions", sa.Column("email", sa.String(length=320), nullable=True))
     op.add_column("institutions", sa.Column("phone", sa.String(length=50), nullable=True))

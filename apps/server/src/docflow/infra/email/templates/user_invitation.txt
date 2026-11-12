@@ -1,0 +1,15 @@
+{% extends "base.txt" %}
+
+{% block content %}
+Olá, {{ user_name }}!
+
+Você foi convidado(a) para fazer parte da instituição {{ institution_name }} no DocFlow com o perfil de {{ role | default("Funcionário") }}.
+
+Para ativar o seu acesso e definir a sua senha com segurança, acesse o link abaixo:
+
+{{ invite_url }}
+
+Atenção: Por motivos de segurança, este convite expira em {{ expires_in_hours | default(48) }} horas.
+
+Se você não esperava por este convite, por favor desconsidere esta mensagem.
+{% endblock %}

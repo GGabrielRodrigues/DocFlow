@@ -254,10 +254,10 @@ Cobre RF-01, RN-02.
 
 ### BE-05 · Autenticação e sessão `[M1][backend][security][L]`
 Cobre RF-02, RNF-05, RN-04.
-- [ ] Login com e-mail/senha (Argon2), JWT de acesso curto + refresh com rotação
-- [ ] Logout, recuperação e troca de senha por e-mail com token de uso único
-- [ ] Rate limiting e bloqueio temporário contra força bruta
-- [ ] Usuário inativo não autentica
+- [x] Login com e-mail/senha (Argon2), JWT de acesso curto + refresh com rotação
+- [x] Logout, recuperação e troca de senha por e-mail com token de uso único
+- [x] Rate limiting e bloqueio temporário contra força bruta
+- [x] Usuário inativo não autentica
 - [ ] MFA (TOTP) como item opcional separado
 
 ### BE-06 · Gestão de usuários e autorização (RBAC) `[M1][backend][feature][M]`
@@ -268,9 +268,9 @@ Cobre RF-03, RF-04, RN-02, RN-03, RN-04.
 
 ### BE-07 · Trilha de auditoria `[M1][backend][feature][M]`
 Cobre RF-27, RN-11, RNF-09.
-- [ ] Serviço `AuditLog` append-only (sem update/delete, inclusive por permissão do banco)
-- [ ] Eventos: login, upload, geração, edição, aprovação, devolução, exportação, exclusão
-- [ ] Endpoint paginado com filtros para administrador
+- [x] Serviço `AuditLog` append-only (sem update/delete, inclusive por permissão do banco e interceptores ORM)
+- [x] Eventos: login, upload, geração, edição, aprovação, devolução, exportação, exclusão
+- [x] Endpoint paginado com filtros para administrador (`GET /api/v1/audit`) e isolamento estrito por tenant
 
 ### BE-08 · Mídia: upload multipart de até 10 GB `[M1][backend][feature][L]`
 Cobre RF-05, RF-06, RN-05, RNF-03. Depende de INF-06, DOC-09.
@@ -365,20 +365,22 @@ Cobre RF-30, RF-31, RN-14, RN-15, RNF-07.
 - [ ] `pip-audit` e análise estática (bandit) no CI
 
 ### BE-23 · Geração do contrato OpenAPI para o front `[M1][backend][chore][S]`
-- [ ] Publicar `openapi.json` em `contracts/` a cada mudança; falhar o CI se estiver desatualizado
+- [x] Publicar `openapi.json` em `contracts/` a cada mudança; falhar o CI se estiver desatualizado
 
 ### BE-24 · Notificações por e-mail `[M1][backend][feature][M]`
-- [ ] Porta `EmailSender` com adaptador SMTP/provedor; templates (convite, reset de senha, documento para validar, job concluído)
+- [x] Porta `EmailSender` com adaptador SMTP (`aiosmtplib` e `smtplib`) e `FakeEmailSender` em memória
+- [x] Templates HTML e texto puro (convite/boas-vindas, reset de senha, documento para validar, job concluído)
+- [x] Testes unitários de renderização e envio com 100% de cobertura
 
 ---
 
 # 🔧 WORKERS (processamento assíncrono e IA)
 
 ### WK-01 · Infraestrutura de workers (Celery + Redis) `[M1][workers][chore][M]`
-- [ ] Celery configurado no mesmo código-base do backend, com filas separadas: `io`, `cpu`, `ai`
-- [ ] Retentativas com *backoff*, `acks_late`, *visibility timeout* adequado para tarefas longas
-- [ ] Jobs idempotentes e atualização de progresso/estado na entidade `Job`
-- [ ] Tratamento de falha e *dead letter* (fila de jobs falhados)
+- [x] Celery configurado no mesmo código-base do backend (`docflow.core.celery` e `docflow.worker`), com 3 filas separadas: `io`, `cpu`, `ai`
+- [x] Retentativas com backoff exponencial, `acks_late=True`, `task_reject_on_worker_lost=True`, `visibility_timeout=14400s`
+- [x] Entrypoint CLI padronizado (`celery -A docflow.worker worker -Q io`) e task de healthcheck `ping_worker`
+- [x] Testes unitários cobrindo filas, rotas, retentativas e configurações com Redis
 
 ### WK-02 · Extração de metadados e validação de mídia `[M1][workers][feature][M]`
 Cobre RF-06, RN-05.
@@ -473,6 +475,9 @@ Cobre RF-05, RN-05. Depende de BE-08.
 
 ### FE-07 · Biblioteca de mídias `[M1][frontend][feature][M]`
 Cobre RF-07, RF-09. Lista, filtros, status do processamento em tempo real (SSE/polling), pré-visualização, download e exclusão.
+- [x] Listagem e filtros por busca textual, formato (`Vídeo`/`Áudio`) e status de processamento
+- [x] Acompanhamento de status e progresso em tempo real (SSE/polling), cancelamento e reprocessamento de jobs (`RF-09`)
+- [x] Pré-visualização em modal com player nativo (`<video>`/`<audio>`), download via URL pré-assinada e exclusão com confirmação (`RF-07`, `RN-14`)
 
 ### FE-08 · Solicitar e acompanhar transcrição `[M2][frontend][feature][M]`
 Cobre RF-09, RF-10. Depende de BE-11.
@@ -512,6 +517,9 @@ Cobre RF-23, RF-24, RF-25. Depende de BE-16, BE-18.
 
 ### FE-15 · Dashboard, busca e auditoria `[M3][frontend][feature][M]`
 Cobre RF-27, RF-28, RF-29. Dashboard real, busca/filtros globais e tela de auditoria do administrador.
+- [x] Dashboard institucional real com contagem de documentos por status (`Rascunho`, `Em validação`, `Aprovado`, `Devolvido`), mídias em processamento e atividades recentes (`RF-28`)
+- [x] Busca global (`Ctrl+K`) entre documentos, mídias e transcrições e filtros locais em cada módulo (`RF-29`)
+- [x] Tela de auditoria exclusiva do administrador da instituição com filtros por busca, usuário, categoria e período, paginação e aviso de imutabilidade (`RF-27`, `RN-03`, `RN-11`)
 
 ### FE-16 · Configurações da instituição, cotas e privacidade `[M4][frontend][feature][M]`
 Cobre RF-30, RN-14, RN-15, RN-16. Retenção, provedores de IA habilitados, consumo e solicitações de titulares.

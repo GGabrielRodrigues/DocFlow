@@ -101,6 +101,7 @@ from pydantic import BaseModel
 
 T = TypeVar("T", bound=BaseModel)
 
+
 class TranscriptionProvider(Protocol):
     async def transcribe(
         self,

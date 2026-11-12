@@ -12,6 +12,10 @@ sqlalchemy = ">=2.0,<3.0"
 alembic = ">=1.14,<2.0"
 pydantic-settings = ">=2.6,<3.0"
 uvicorn = { version = ">=0.32,<1.0", extras = ["standard"] }
+jinja2 = ">=3.1.0,<4.0"
+aiosmtplib = ">=3.0,<6.0"
+celery = ">=5.4.0,<6.0.0"
+redis = ">=5.0.0,<6.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.0,<9.0"
@@ -28,6 +32,8 @@ pre-commit = ">=3.8,<5.0"
 
 [tool.poetry.scripts]
 docflow-api = "docflow.main:run"
+docflow-worker = "docflow.worker:main"
+docflow-openapi = "docflow.cli.openapi:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0"]
@@ -59,6 +65,14 @@ ignore = ["B008"]
 strict = true
 python_version = "3.12"
 mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["celery.*", "kombu.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["docflow.core.celery", "docflow.worker"]
+disallow_untyped_calls = false
 
 [tool.importlinter]
 root_package = "docflow"

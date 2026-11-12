@@ -41,9 +41,10 @@ class SqlAlchemyRegistrationRepository(RegistrationRepository):
             raise RegistrationConflictError("CNPJ ou e-mail já cadastrado") from error
 
     def has_cnpj(self, cnpj: str) -> bool:
-        return self.session.scalar(
-            select(InstitutionModel.id).where(InstitutionModel.cnpj == cnpj)
-        ) is not None
+        return (
+            self.session.scalar(select(InstitutionModel.id).where(InstitutionModel.cnpj == cnpj))
+            is not None
+        )
 
     def has_user_email(self, email: str) -> bool:
         return self.session.scalar(select(UserModel.id).where(UserModel.email == email)) is not None

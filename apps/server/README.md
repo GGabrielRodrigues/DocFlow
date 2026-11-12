@@ -67,6 +67,12 @@ Com `DOCFLOW_DEBUG=true`, a documentação interativa fica disponível em
   - `poetry run alembic downgrade -1`: reverte a última migração.
   - `poetry run alembic revision --autogenerate -m "descricao"`: cria uma migração após alterar os modelos.
 
+- Workers Celery:
+  - `celery -A docflow.worker worker -Q io`: inicia worker para a fila `io` (S3/upload, e-mails, I/O leves).
+  - `celery -A docflow.worker worker -Q cpu`: inicia worker para a fila `cpu` (FFmpeg e conversão de documentos).
+  - `celery -A docflow.worker worker -Q ai`: inicia worker para a fila `ai` (transcrição e LLM).
+  - `docflow-worker`: alias do entrypoint CLI configurado em `pyproject.toml`.
+
 - `src/docflow/main.py`: criação da aplicação e entrypoint do Uvicorn.
 - `src/docflow/api/router.py`: composição dos routers HTTP da aplicação.
 - `src/docflow/api/routers/`: routers HTTP e seus schemas de entrada/saída.
