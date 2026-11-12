@@ -18,6 +18,7 @@ import type {
 } from "@/lib/types"
 import { AuditPage } from "@/modules/admin/AuditPage"
 import { DashboardPage } from "@/modules/admin/DashboardPage"
+import { GlobalSearchModal } from "@/modules/admin/GlobalSearchModal"
 import { InstitutionPage } from "@/modules/admin/InstitutionPage"
 import { UsersPage } from "@/modules/admin/UsersPage"
 import { AuthFlow } from "@/modules/auth/AuthFlow"
@@ -59,7 +60,13 @@ const navItems: NavItemConfig[] = [
     label: "Transcrições",
     icon: "mic",
   },
-  { id: "audit", path: "/audit", label: "Auditoria", icon: "history" },
+  {
+    id: "audit",
+    path: "/audit",
+    label: "Auditoria",
+    icon: "history",
+    adminOnly: true,
+  },
   {
     id: "institution",
     path: "/institution",
@@ -103,6 +110,7 @@ export function AppShell() {
   const [pendingInstitutionId, setPendingInstitutionId] =
     useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [toast, setToast] = useState("")
 
   const { data: store } = useQuery<Store>({
@@ -133,6 +141,18 @@ export function AppShell() {
     document.addEventListener("keydown", handleKeyDown)
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [sidebarOpen])
+
+  useEffect(() => {
+    const handleGlobalSearchShortcut = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault()
+        setSearchOpen((prev) => !prev)
+      }
+    }
+    document.addEventListener("keydown", handleGlobalSearchShortcut)
+    return () =>
+      document.removeEventListener("keydown", handleGlobalSearchShortcut)
+  }, [])
 
   const notify = (message: string) => setToast(message)
 
@@ -438,14 +458,26 @@ export function AppShell() {
               <strong>{institution.name}</strong>
             </span>
           </div>
-          <div className="topbar__user">
-            <span>
-              <small>Olá,</small>
-              <strong>{firstName(currentUser.name)}</strong>
-            </span>
-            <span className="avatar avatar--small" aria-hidden="true">
-              {initials(currentUser.name)}
-            </span>
+          <div className="topbar__actions">
+            <button
+              type="button"
+              className="topbar__search-btn"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Abrir busca global"
+            >
+              <Icon name="search" size={16} />
+              <span>Buscar documentos, mídias ou transcrições...</span>
+              <kbd>Ctrl+K</kbd>
+            </button>
+            <div className="topbar__user">
+              <span>
+                <small>Olá,</small>
+                <strong>{firstName(currentUser.name)}</strong>
+              </span>
+              <span className="avatar avatar--small" aria-hidden="true">
+                {initials(currentUser.name)}
+              </span>
+            </div>
           </div>
         </header>
         <main id="main-content" className="content" tabIndex={-1}>
@@ -455,6 +487,7 @@ export function AppShell() {
               element={
                 <DashboardPage
                   documents={scopedDocuments}
+                  media={scopedMedia}
                   users={scopedUsers}
                   audits={scopedAudits}
                   allUsers={store.users}
@@ -541,7 +574,13 @@ export function AppShell() {
             />
             <Route
               path="/audit"
-              element={<AuditPage audits={scopedAudits} users={store.users} />}
+              element={
+                isAdmin ? (
+                  <AuditPage audits={scopedAudits} users={store.users} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
             />
             <Route
               path="/institution"
@@ -571,6 +610,15 @@ export function AppShell() {
           </Routes>
         </main>
       </div>
+      {searchOpen && (
+        <GlobalSearchModal
+          documents={scopedDocuments}
+          media={scopedMedia}
+          transcripts={scopedTranscripts}
+          onNavigate={navigateToPage}
+          onClose={() => setSearchOpen(false)}
+        />
+      )}
       <Toast message={toast} onDismiss={() => setToast("")} />
     </div>
   )

@@ -23,12 +23,19 @@ export function DocumentsPage({
 }: DocumentsPageProps) {
   const [query, setQuery] = useState("")
   const [filter, setFilter] = useState("Todos")
+  const [typeFilter, setTypeFilter] = useState("Todos os tipos")
 
-  const visible = documents.filter(
-    (doc) =>
-      (filter === "Todos" || doc.status === filter) &&
-      doc.title.toLowerCase().includes(query.toLowerCase()),
-  )
+  const visible = documents.filter((doc) => {
+    const matchesStatus = filter === "Todos" || doc.status === filter
+    const matchesType =
+      typeFilter === "Todos os tipos" || doc.type === typeFilter
+    const normalizedQuery = query.trim().toLowerCase()
+    const matchesQuery =
+      !normalizedQuery ||
+      doc.title.toLowerCase().includes(normalizedQuery) ||
+      doc.content.toLowerCase().includes(normalizedQuery)
+    return matchesStatus && matchesType && matchesQuery
+  })
 
   return (
     <>
@@ -44,15 +51,31 @@ export function DocumentsPage({
       />
       <section className="panel">
         <div className="toolbar">
-          <label className="search">
-            <Icon name="search" size={17} />
-            <input
-              aria-label="Buscar documentos por título"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por título..."
-            />
-          </label>
+          <div className="toolbar__controls">
+            <label className="search">
+              <Icon name="search" size={17} />
+              <input
+                aria-label="Buscar documentos por título"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Buscar por título..."
+              />
+            </label>
+            <span className="select-wrap">
+              <select
+                aria-label="Filtrar documentos por tipo"
+                className="input toolbar__select"
+                value={typeFilter}
+                onChange={(event) => setTypeFilter(event.target.value)}
+              >
+                <option value="Todos os tipos">Todos os tipos</option>
+                <option value="Ata">Ata</option>
+                <option value="Ofício">Ofício</option>
+                <option value="Prestação de contas">Prestação de contas</option>
+              </select>
+              <Icon name="chevron" size={14} />
+            </span>
+          </div>
           <div
             className="filter-tabs"
             role="group"

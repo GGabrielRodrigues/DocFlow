@@ -517,6 +517,9 @@ Cobre RF-23, RF-24, RF-25. Depende de BE-16, BE-18.
 
 ### FE-15 · Dashboard, busca e auditoria `[M3][frontend][feature][M]`
 Cobre RF-27, RF-28, RF-29. Dashboard real, busca/filtros globais e tela de auditoria do administrador.
+- [x] Dashboard institucional real com contagem de documentos por status (`Rascunho`, `Em validação`, `Aprovado`, `Devolvido`), mídias em processamento e atividades recentes (`RF-28`)
+- [x] Busca global (`Ctrl+K`) entre documentos, mídias e transcrições e filtros locais em cada módulo (`RF-29`)
+- [x] Tela de auditoria exclusiva do administrador da instituição com filtros por busca, usuário, categoria e período, paginação e aviso de imutabilidade (`RF-27`, `RN-03`, `RN-11`)
 
 ### FE-16 · Configurações da instituição, cotas e privacidade `[M4][frontend][feature][M]`
 Cobre RF-30, RN-14, RN-15, RN-16. Retenção, provedores de IA habilitados, consumo e solicitações de titulares.
