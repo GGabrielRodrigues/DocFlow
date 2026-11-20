@@ -282,9 +282,9 @@ Cobre RF-05, RF-06, RN-05, RNF-03. Depende de INF-06, DOC-09.
 
 ### BE-09 · Mídia: listagem, detalhe, download e exclusão `[M1][backend][feature][M]`
 Cobre RF-07, RN-13, RN-14.
-- [ ] URLs assinadas e temporárias para pré-visualização/download
-- [ ] Exclusão remove arquivos do storage e dados derivados
-- [ ] Controle de acesso: autor, administradores e compartilhados
+- [x] URLs assinadas e temporárias para pré-visualização/download
+- [x] Exclusão remove arquivos do storage e dados derivados
+- [x] Controle de acesso: autor, administradores e compartilhados
 
 ### BE-10 · Jobs: modelo, fila e acompanhamento `[M1][backend][feature][M]`
 Cobre RF-09, RNF-04. Depende de WK-01.

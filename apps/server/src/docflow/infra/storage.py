@@ -31,6 +31,15 @@ class ObjectStorage:
     def head_object(self, *, bucket: str, key: str) -> dict[str, object]:
         raise NotImplementedError
 
+    def presign_object(self, *, bucket: str, key: str, expires_seconds: int = 900) -> str:
+        raise NotImplementedError
+
+    def delete_object(self, *, bucket: str, key: str) -> None:
+        raise NotImplementedError
+
+    def delete_prefix(self, *, bucket: str, prefix: str) -> int:
+        raise NotImplementedError
+
 
 class S3ObjectStorage(ObjectStorage):
     def __init__(
@@ -92,6 +101,30 @@ class S3ObjectStorage(ObjectStorage):
     def head_object(self, *, bucket: str, key: str) -> dict[str, object]:
         headers = cast(dict[str, str], self._request("HEAD", bucket, key, return_headers=True))
         return {"content_length": int(headers.get("Content-Length", "0"))}
+
+    def presign_object(self, *, bucket: str, key: str, expires_seconds: int = 900) -> str:
+        previous_expiry = self.presign_expiry_seconds
+        self.presign_expiry_seconds = expires_seconds
+        try:
+            return self._presigned_url("GET", bucket, key, {})
+        finally:
+            self.presign_expiry_seconds = previous_expiry
+
+    def delete_object(self, *, bucket: str, key: str) -> None:
+        self._request("DELETE", bucket, key)
+
+    def delete_prefix(self, *, bucket: str, prefix: str) -> int:
+        query = {"list-type": "2", "prefix": prefix}
+        response = cast(bytes, self._request("GET", bucket, "", query=query))
+        root = ElementTree.fromstring(response)
+        keys = [
+            node.text
+            for node in root.findall(".//{*}Contents/{*}Key")
+            if node.text
+        ]
+        for key in keys:
+            self.delete_object(bucket=bucket, key=key)
+        return len(keys)
 
     def _presigned_url(
         self, method: str, bucket: str, key: str, query: dict[str, str]
@@ -249,6 +282,25 @@ class InMemoryObjectStorage(ObjectStorage):
             return self.objects[(bucket, key)]
         except KeyError as error:
             raise StorageError("Objeto não encontrado") from error
+
+    def presign_object(self, *, bucket: str, key: str, expires_seconds: int = 900) -> str:
+        if (bucket, key) not in self.objects:
+            raise StorageError("Objeto não encontrado")
+        expires_at = datetime.now(UTC) + timedelta(seconds=expires_seconds)
+        return f"memory://{bucket}/{key}?expires={expires_at.isoformat()}"
+
+    def delete_object(self, *, bucket: str, key: str) -> None:
+        self.objects.pop((bucket, key), None)
+
+    def delete_prefix(self, *, bucket: str, prefix: str) -> int:
+        keys = [
+            (stored_bucket, key)
+            for stored_bucket, key in self.objects
+            if stored_bucket == bucket and key.startswith(prefix)
+        ]
+        for key in keys:
+            del self.objects[key]
+        return len(keys)
 
     def cleanup_expired(self, *, older_than: timedelta) -> int:
         cutoff = datetime.now(UTC) - older_than

@@ -1,5 +1,7 @@
 """Porta do serviço de envio de e-mails do DocFlow."""
 
+from __future__ import annotations
+
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable

@@ -66,6 +66,12 @@ class MediaModel(TenantScopedMixin, Base):
     __tablename__ = "media"
 
     id: Mapped[Id] = mapped_column(default=lambda: str(uuid4()))
+    author_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("users.id"),
+        nullable=True,
+        index=True,
+    )
     original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
     content_type: Mapped[str] = mapped_column(String(100), nullable=False)
     size_bytes: Mapped[int] = mapped_column(nullable=False)
@@ -78,6 +84,25 @@ class MediaModel(TenantScopedMixin, Base):
         DateTime(timezone=True),
         default=datetime.utcnow,
         nullable=False,
+    )
+
+
+class MediaShareModel(Base):
+    __tablename__ = "media_shares"
+    __table_args__ = (UniqueConstraint("media_id", "user_id", name="uq_media_share"),)
+
+    id: Mapped[Id] = mapped_column(default=lambda: str(uuid4()))
+    media_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("media.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
 
 

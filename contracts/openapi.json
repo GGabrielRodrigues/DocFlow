@@ -89,6 +89,615 @@
         }
       }
     },
+    "/api/v1/media/uploads/init": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Init Upload",
+        "operationId": "init_upload_api_v1_media_uploads_init_post",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadInitRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadInitResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{media_id}/uploads/presign-parts": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Presign Parts",
+        "operationId": "presign_parts_api_v1_media__media_id__uploads_presign_parts_post",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresignPartsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresignPartsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{media_id}/uploads/complete": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Complete Upload",
+        "operationId": "complete_upload_api_v1_media__media_id__uploads_complete_post",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "List Media",
+        "operationId": "list_media_api_v1_media_get",
+        "parameters": [
+          {
+            "name": "status_filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status Filter"
+            }
+          },
+          {
+            "name": "content_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Content Type"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{media_id}/shares": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Share Media",
+        "operationId": "share_media_api_v1_media__media_id__shares_post",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MediaShareRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaShareResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{media_id}/shares/{user_id}": {
+      "delete": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Unshare Media",
+        "operationId": "unshare_media_api_v1_media__media_id__shares__user_id__delete",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{media_id}": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Get Media",
+        "operationId": "get_media_api_v1_media__media_id__get",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Delete Media",
+        "operationId": "delete_media_api_v1_media__media_id__delete",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/media/{media_id}/uploads/abort": {
+      "post": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Abort Upload",
+        "operationId": "abort_upload_api_v1_media__media_id__uploads_abort_post",
+        "parameters": [
+          {
+            "name": "media_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Media Id"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/audit": {
       "get": {
         "tags": [
@@ -710,7 +1319,6 @@
         }
       }
     }
-    }
   },
   "components": {
     "schemas": {
@@ -852,6 +1460,25 @@
           "created_at"
         ],
         "title": "AuditLogItemResponse"
+      },
+      "CompleteUploadRequest": {
+        "properties": {
+          "parts": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "maxItems": 10000,
+            "minItems": 1,
+            "title": "Parts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parts"
+        ],
+        "title": "CompleteUploadRequest"
       },
       "ForgotPasswordRequest": {
         "properties": {
@@ -1123,6 +1750,190 @@
         ],
         "title": "MeResponse"
       },
+      "MediaDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "institution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Institution Id"
+          },
+          "author_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Id"
+          },
+          "original_filename": {
+            "type": "string",
+            "title": "Original Filename"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "declared_duration_seconds": {
+            "type": "integer",
+            "title": "Declared Duration Seconds"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "preview_url": {
+            "type": "string",
+            "title": "Preview Url"
+          },
+          "download_url": {
+            "type": "string",
+            "title": "Download Url"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "institution_id",
+          "original_filename",
+          "content_type",
+          "size_bytes",
+          "declared_duration_seconds",
+          "status",
+          "preview_url",
+          "download_url",
+          "expires_in"
+        ],
+        "title": "MediaDetailResponse"
+      },
+      "MediaListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MediaResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "MediaListResponse"
+      },
+      "MediaResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "institution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Institution Id"
+          },
+          "author_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Id"
+          },
+          "original_filename": {
+            "type": "string",
+            "title": "Original Filename"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "title": "Size Bytes"
+          },
+          "declared_duration_seconds": {
+            "type": "integer",
+            "title": "Declared Duration Seconds"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "institution_id",
+          "original_filename",
+          "content_type",
+          "size_bytes",
+          "declared_duration_seconds",
+          "status"
+        ],
+        "title": "MediaResponse"
+      },
+      "MediaShareRequest": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "MediaShareRequest"
+      },
+      "MediaShareResponse": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id",
+          "user_id"
+        ],
+        "title": "MediaShareResponse"
+      },
       "MessageResponse": {
         "properties": {
           "message": {
@@ -1171,6 +1982,41 @@
           "total_pages"
         ],
         "title": "PaginatedAuditLogsResponse"
+      },
+      "PresignPartsRequest": {
+        "properties": {
+          "part_numbers": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 10000,
+            "minItems": 1,
+            "title": "Part Numbers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "part_numbers"
+        ],
+        "title": "PresignPartsRequest"
+      },
+      "PresignPartsResponse": {
+        "properties": {
+          "parts": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Parts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parts"
+        ],
+        "title": "PresignPartsResponse"
       },
       "ReadinessResponse": {
         "properties": {
@@ -1346,6 +2192,91 @@
           "refresh_token"
         ],
         "title": "TokenResponse"
+      },
+      "UploadInitRequest": {
+        "properties": {
+          "filename": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Filename"
+          },
+          "content_type": {
+            "type": "string",
+            "title": "Content Type"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Size Bytes"
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Duration Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "filename",
+          "content_type",
+          "size_bytes",
+          "duration_seconds"
+        ],
+        "title": "UploadInitRequest"
+      },
+      "UploadInitResponse": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id"
+          },
+          "upload_id": {
+            "type": "string",
+            "title": "Upload Id"
+          },
+          "part_size": {
+            "type": "integer",
+            "title": "Part Size"
+          },
+          "total_parts": {
+            "type": "integer",
+            "title": "Total Parts"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id",
+          "upload_id",
+          "part_size",
+          "total_parts",
+          "status"
+        ],
+        "title": "UploadInitResponse"
+      },
+      "UploadStatusResponse": {
+        "properties": {
+          "media_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Media Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "media_id",
+          "status"
+        ],
+        "title": "UploadStatusResponse"
       },
       "UserMeResponse": {
         "properties": {

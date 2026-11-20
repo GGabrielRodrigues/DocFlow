@@ -146,6 +146,8 @@ Todos os endpoints de listagem aceitam os seguintes *query parameters*:
 | `POST` | `/api/v1/media/{media_id}/uploads/abort` | Autenticado | Cancela o upload em andamento e remove partes órfãs no Silo. |
 | `GET` | `/api/v1/media` | Autenticado | Lista mídias da instituição (filtros por status, tipo e busca textual, `RF-07`). |
 | `GET` | `/api/v1/media/{media_id}` | Autenticado | Retorna detalhes da mídia + URL pré-assinada temporária para player/download. |
+| `POST` | `/api/v1/media/{media_id}/shares` | Autor ou administrador | Compartilha a mídia com um usuário da mesma instituição. |
+| `DELETE` | `/api/v1/media/{media_id}/shares/{user_id}` | Autor ou administrador | Remove o compartilhamento da mídia. |
 | `POST` | `/api/v1/media/{media_id}/compress` | Autenticado | Enfileira job de compressão ilimitada (`LIGHT`, `HIGH_QUALITY`, `AUDIO_ONLY`), gerando nova mídia (`202 Accepted`, `RF-08`, `RN-18`). |
 | `DELETE` | `/api/v1/media/{media_id}` | Autenticado | Exclui a mídia do Silo e seus artefatos derivados (`RF-07`, `RF-30`). |
 
