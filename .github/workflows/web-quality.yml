@@ -1,0 +1,61 @@
+name: Web Quality
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "contracts/**"
+      - ".github/workflows/web-quality.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/web/**"
+      - "contracts/**"
+      - ".github/workflows/web-quality.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Frontend quality & OpenAPI client sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Verify OpenAPI TypeScript Client Sync
+        working-directory: apps/web
+        run: npm run generate:api:check
+
+      - name: Format check (oxfmt)
+        working-directory: apps/web
+        run: npm run format:check
+
+      - name: Lint (oxlint)
+        working-directory: apps/web
+        run: npm run lint
+
+      - name: Typecheck (tsc)
+        working-directory: apps/web
+        run: npm run typecheck
+
+      - name: Unit and integration tests (Vitest)
+        working-directory: apps/web
+        run: npm run test
+
+      - name: Build production bundle
+        working-directory: apps/web
+        run: npm run build
