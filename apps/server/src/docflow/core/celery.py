@@ -37,6 +37,7 @@ CELERY_TASK_ROUTES: dict[str, dict[str, str]] = {
     "docflow.tasks.io.*": {"queue": "io"},
     "docflow.tasks.cpu.*": {"queue": "cpu"},
     "docflow.tasks.ai.*": {"queue": "ai"},
+    "docflow.tasks.jobs.*": {"queue": "cpu"},
 }
 
 
@@ -62,6 +63,7 @@ def create_celery_app(settings: Settings | None = None) -> Celery:
     app.conf.update(
         broker_url=broker,
         result_backend=backend,
+        docflow_database_url=cfg.database_url,
         task_always_eager=cfg.celery_task_always_eager,
         task_eager_propagates=True,
         task_queues=CELERY_QUEUES,
@@ -99,9 +101,17 @@ def create_celery_app(settings: Settings | None = None) -> Celery:
 
 def register_tasks(app: Celery) -> None:
     """Registra as tarefas padrão do sistema no Celery App."""
+    from docflow.tasks.jobs import run_job_impl
+
     app.task(
         _ping_worker_impl,
         name="docflow.worker.ping_worker",
+        base=DocFlowTask,
+        bind=True,
+    )
+    app.task(
+        run_job_impl,
+        name="docflow.tasks.jobs.run",
         base=DocFlowTask,
         bind=True,
     )

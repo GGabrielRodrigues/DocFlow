@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from typing import Annotated, Any
 from uuid import uuid4
 
-from sqlalchemy import JSON, DateTime, ForeignKey, String, UniqueConstraint, event
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, UniqueConstraint, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, declared_attr, mapped_column
 
 from docflow.domain.audit import AuditLog, AuditLogImmutableError
@@ -103,6 +103,45 @@ class MediaShareModel(Base):
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
+    )
+
+
+class JobModel(TenantScopedMixin, Base):
+    __tablename__ = "jobs"
+    __table_args__ = (
+        UniqueConstraint(
+            "institution_id",
+            "idempotency_key",
+            name="uq_jobs_institution_idempotency",
+        ),
+    )
+
+    id: Mapped[Id] = mapped_column(default=lambda: str(uuid4()))
+    requested_by_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True,
+    )
+    type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    state: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    progress: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    error: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    resource_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    resource_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    idempotency_key: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    celery_task_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
     )
 
 

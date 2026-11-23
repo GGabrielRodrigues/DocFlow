@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import uvicorn
+from celery import Celery
 from fastapi import FastAPI
 
 from docflow.api.router import create_api_router
+from docflow.core.celery import create_celery_app
 from docflow.core.config import Settings, get_settings
 from docflow.core.logging import configure_logging
 from docflow.core.middleware import RequestIdMiddleware
@@ -13,7 +15,9 @@ from docflow.infra.storage import InMemoryObjectStorage, ObjectStorage, S3Object
 
 
 def create_app(
-    settings: Settings | None = None, storage: ObjectStorage | None = None
+    settings: Settings | None = None,
+    storage: ObjectStorage | None = None,
+    celery_app: Celery | None = None,
 ) -> FastAPI:
     app_settings = settings or get_settings()
     session_factory = create_session_factory(app_settings)
@@ -44,6 +48,7 @@ def create_app(
             session_factory,
             configured_storage or InMemoryObjectStorage(),
             app_settings.storage_bucket_media_raw,
+            celery_app or create_celery_app(app_settings),
         )
     )
     return app

@@ -288,10 +288,10 @@ Cobre RF-07, RN-13, RN-14.
 
 ### BE-10 · Jobs: modelo, fila e acompanhamento `[M1][backend][feature][M]`
 Cobre RF-09, RNF-04. Depende de WK-01.
-- [ ] Entidade `Job` (tipo, estado, progresso, erro, tentativas) e máquina de estados
-- [ ] Endpoints de status, cancelamento e reprocessamento
-- [ ] SSE (ou polling) para o front acompanhar progresso
-- [ ] Idempotência: reenviar o mesmo job não duplica efeitos
+- [x] Entidade `Job` (tipo, estado, progresso, erro, tentativas) e máquina de estados
+- [x] Endpoints de status, cancelamento e reprocessamento
+- [x] SSE (ou polling) para o front acompanhar progresso
+- [x] Idempotência: reenviar o mesmo job não duplica efeitos
 
 ### BE-11 · Transcrição: casos de uso e API `[M2][backend][feature][L]`
 Cobre RF-10, RF-13, RF-14. Depende de BE-10, WK-03.

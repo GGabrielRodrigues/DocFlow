@@ -1,3 +1,4 @@
+from celery import Celery
 from fastapi import APIRouter
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -5,6 +6,7 @@ from docflow.api.routers.audit import router as audit_router
 from docflow.api.routers.auth import router as auth_router
 from docflow.api.routers.health import router as health_router
 from docflow.api.routers.institutions import create_institutions_router
+from docflow.api.routers.jobs import create_jobs_router
 from docflow.api.routers.media import create_media_router
 from docflow.application.media import MediaUploadService
 from docflow.infra.storage import ObjectStorage
@@ -14,6 +16,7 @@ def create_api_router(
     session_factory: sessionmaker[Session],
     storage: ObjectStorage,
     media_bucket: str = "media-raw",
+    celery_app: Celery | None = None,
 ) -> APIRouter:
     router = APIRouter()
     router.include_router(health_router)
@@ -24,6 +27,8 @@ def create_api_router(
             MediaUploadService(storage, media_bucket),
         )
     )
+    if celery_app is not None:
+        router.include_router(create_jobs_router(session_factory, celery_app))
 
     v1_router = APIRouter(prefix="/api/v1")
     v1_router.include_router(audit_router)

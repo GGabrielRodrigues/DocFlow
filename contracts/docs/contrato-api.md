@@ -154,11 +154,13 @@ Todos os endpoints de listagem aceitam os seguintes *query parameters*:
 ### 5.4. Jobs Assíncronos (`shared` / `jobs`)
 | Método | Rota | Acesso | Descrição |
 | :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/jobs` | Autenticado | Cria/enfileira um job assíncrono; aceita `Idempotency-Key` e retorna `202 Accepted` com o objeto `Job`. |
 | `GET` | `/api/v1/jobs` | Autenticado | Lista jobs da instituição (filtro por `status`, `job_type`, `media_id`, `document_id`). |
 | `GET` | `/api/v1/jobs/{job_id}` | Autenticado | Consulta estado atual (`QUEUED`, `PROCESSING`, `COMPLETED`, `FAILED`, `CANCELED`) e `progress_percent` (`RF-09`). |
 | `GET` | `/api/v1/jobs/{job_id}/events` | Autenticado | Stream Server-Sent Events (SSE) de progresso em tempo real. |
 | `POST` | `/api/v1/jobs/{job_id}/cancel` | Autenticado | Cancela job em fila ou em execução. |
-| `POST` | `/api/v1/jobs/{job_id}/retry` | Autenticado | Reprocessa um job que falhou (`RF-09`). |
+| `POST` | `/api/v1/jobs/{job_id}/retry` | Autenticado | Reprocessa um job que falhou ou foi cancelado (`RF-09`). |
+| `POST` | `/api/v1/jobs/{job_id}/reprocess` | Autenticado | Alias explícito de reprocessamento de um job que falhou ou foi cancelado. |
 
 ### 5.5. Transcrições e Diarização (`transcription`)
 | Método | Rota | Acesso | Descrição |
